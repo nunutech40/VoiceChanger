@@ -1,17 +1,21 @@
 # VoiceChanger 🎙️✨ (AuraVoice)
 
-**VoiceChanger (AuraVoice)** adalah aplikasi *mobile cross-platform* (iOS & Android) yang dirancang untuk merekam suara dan memanipulasinya menggunakan algoritma *Digital Signal Processing* (DSP) secara *real-time*.
+# VoiceChanger 🎙️✨ (AuraVoice)
 
-Aplikasi ini didesain sebagai *showcase* portofolio *Mobile Development*, memadukan antarmuka **Flutter** yang interaktif dengan otak komputasi audio tingkat rendah berbasis **C++ (SoLoud Engine)** melalui Dart FFI.
+**VoiceChanger (AuraVoice)** bukanlah sekadar aplikasi pengubah suara. Ini adalah **Pabrik Konten (Content Factory)** dan sarana **Tech-Flexing** yang dibangun di atas fondasi *mobile cross-platform* (iOS & Android).
+
+Aplikasi ini didesain secara khusus dengan dua tujuan utama:
+1.  **Untuk TikTok:** Menyajikan *UI/UX* yang *over-engineered* bergaya *hacker* audio untuk menciptakan *gimmick* visual yang kuat di depan kamera.
+2.  **Untuk X (Twitter):** Memamerkan kebrutalan arsitektur perangkat lunak dengan menyambungkan antarmuka **Flutter** langsung ke otak komputasi **C++ (SoLoud Engine)** melalui Dart FFI demi mencapai latensi nol (*zero-latency DSP*).
 
 > 🤫 **SSSTTT... RAHASIA!**
-> Meskipun aplikasi ini menjanjikan template suara "Monster" atau "Tupai", *engine* utama di lapisan C++ secara murni hanya melakukan operasi matematika terhadap gelombang suara (*Pitch Shifting* dan *Time Stretching*). Manipulasi ini berjalan secara *synchronous* tanpa *overhead* sehingga suara merespons seketika (*zero latency*) setiap kali *slider* digeser!
+> Meskipun aplikasi ini terlihat seperti alat peretas frekuensi rahasia, *engine* utamanya secara murni hanya mengeksekusi operasi matematika terhadap gelombang suara (*Pitch Shifting* dan *Time Stretching*). Namun, arsitektur *Synchronous FFI* yang kami bangun membuat manipulasi ini merespons seketika tanpa *overhead* yang biasa ditemukan pada *MethodChannel*!
 
-## Fitur Utama
-*   **Real-time Audio Modulation:** Geser *slider* dan dengar perubahan nada/tempo suara secara instan tanpa proses *loading*.
-*   **Template Presets:** Pilihan "sulap" suara instan seperti Tupai, Monster, Robot, dan Gua Hantu.
-*   **C++ Engine Bridge:** UI berjalan mulus di Flutter, sementara komputasi audio yang berat dieksekusi oleh mesin C++ (`flutter_soloud`) via Dart FFI.
-*   **Custom Tuning Page:** Halaman kontrol ala teknisi audio (*Voice Modulator*) untuk *fine-tuning* parameter *Pitch*, *Speed*, *Reverb*, dan *Echo*.
+## 🔥 Fitur Utama (The Flex)
+*   **Zero-Latency Audio DSP:** Menggeser *slider* di UI langsung memanipulasi *pointer float* di memori C++. Tidak ada antrean data, tidak ada proses *loading*, murni *real-time*.
+*   **Cinematic Audio Gimmick:** Dilengkapi dengan visualisasi gelombang suara (*fake visualizer*) yang dirender secara terpisah dari *Main Thread* agar terlihat rumit dan canggih di konten video.
+*   **Synchronous FFI Bridge:** Pembuktian konsep bahwa Flutter bisa berjalan secepat aplikasi *Native* jika integrasinya mem- *bypass* arsitektur standar jembatan komunikasi OS.
+*   **Template Absurd:** Preset "sulap" suara instan (Tupai, Monster, Robot) yang siap dipakai untuk membuat *meme* atau video lucu.
 
 ## Dokumen Proyek
 Silakan baca dokumen perencanaan arsitektur di bawah ini:

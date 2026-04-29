@@ -1,19 +1,20 @@
 # Technical Requirements Document (TRD): AuraVoice (Clean Architecture Edition)
 
-## 1. Arsitektur Sistem (Clean Architecture & FFI Bridge)
-Sistem ini menggunakan standar industri **Clean Architecture** (Presentation, Domain, Data) yang dikombinasikan dengan arsitektur **Foreign Function Interface (FFI)** untuk komunikasi tingkat rendah (*low-level*) dengan C++ Audio Engine.
+## 1. Arsitektur Sistem (The Zero-Latency Flex)
+Sistem ini membuang pendekatan *MethodChannel* tradisional (yang lambat dan *asynchronous*) dan menggantinya dengan arsitektur **Direct Memory Access (DMA)** tiruan melalui **Synchronous Foreign Function Interface (FFI)**. 
 
-Tujuannya agar modul Tampilan (Flutter UI) dan Otak Pemroses (Matematika DSP / *Digital Signal Processing*) bekerja sebagai entitas terpisah, namun dapat saling mengirimkan data parameter suara dengan latensi mendekati nol (*zero-latency*).
+Tujuannya? Untuk dipamerkan (*Tech Flexing*). Arsitektur ini membuktikan bahwa Flutter UI dan Otak C++ (DSP) bisa saling memanipulasi *pointer* memori secara *real-time*, menghasilkan modifikasi gelombang suara (*Pitch/Tempo*) tanpa jeda sama sekali. Selain itu, arsitektur ini memisahkan proses berat (Audio) dan proses kosmetik (Visualizer) menggunakan pola **Isolate-driven UI** agar layar berjalan mulus di 120fps.
 
 ## 2. Tech Stack (Spesifikasi Teknologi)
 Berikut adalah daftar lengkap teknologi yang digunakan beserta alasan penggunaannya:
 
 ### 2.1 Flutter / Dart (Lapisan Antarmuka & Logika Bisnis)
-*   **Flutter & Dart:** Digunakan untuk merancang UI pengontrol *slider* dan *template* yang interaktif.
-*   **Clean Architecture:** Memisahkan kode menjadi lapisan `Presentation`, `Domain`, dan `Data` agar mudah dirawat dan diuji.
-*   **BLoC / Cubit (`flutter_bloc`):** *State Management* utama. Mengatur status layar (*Recording* ➡️ *Playback* ➡️ *Tuning*).
-*   **Dependency Injection (`get_it`):** Kontainer sentral agar *UseCase*, *Repository*, dan *Cubit* tersambung secara otomatis dan *loosely coupled*.
-*   **Audio Recording (`record` / `audio_waveforms`):** Pustaka untuk menangkap data suara mentah dari mikrofon OS dan menyimpannya ke memori sementara.
+*   **Flutter & Dart:** Digunakan untuk merancang antarmuka bergaya *hacker* yang *over-engineered*.
+*   **Clean Architecture:** Memisahkan kode menjadi lapisan `Presentation`, `Domain`, dan `Data`.
+*   **Isolate (Dart Concurrency):** Menjalankan kalkulasi *Cinematic Fake Visualizer* di luar *Main Thread*. Tujuannya agar animasi *level meter* yang rumit tidak mengganggu proses rendering UI utama (*Flexing point* untuk diposting di X).
+*   **BLoC / Cubit (`flutter_bloc`):** *State Management* utama yang merespons secara reaktif setiap pergeseran *slider*.
+*   **Dependency Injection (`get_it`):** Kontainer sentral untuk injeksi otomatis *Repository* dan *UseCase*.
+*   **Audio Recording (`record`):** Pustaka untuk menangkap buffer data suara mentah dari mikrofon OS.
 
 ### 2.2 Audio Engine (Lapisan DSP & Kecerdasan Pemrosesan)
 *   **C++ (SoLoud Engine):** *Engine* audio *open-source* berkinerja tinggi yang memproses manipulasi gelombang audio (DSP) murni secara lokal di dalam memori perangkat.
@@ -56,26 +57,26 @@ graph TD
     H --> I[Speaker: Suara Pitch Langsung Berubah]
 ```
 
-### 4.2 Sequence Diagram Anatomi Komunikasi FFI (Dart ke C++)
-Bagian ini membuktikan kenapa kita menggunakan **FFI** alih-alih *MethodChannel* untuk pemrosesan Audio. FFI mengizinkan akses ke ruang memori secara langsung dan instan.
+### 4.2 Sequence Diagram Anatomi Komunikasi FFI (Kenapa MethodChannel Itu Sampah Untuk Audio)
+Bagian ini adalah argumen utama untuk *Tech Flexing*. FFI menendang keluar antrean OS dan membiarkan Dart langsung menusuk ruang memori C++ secara **Synchronous**.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant UI as 💙 Flutter (Dart)
-    participant FFI as ⚡ Dart FFI (Memory Bridge)
+    participant UI as 💙 Flutter (Main Thread)
+    participant FFI as ⚡ Dart FFI (Memory Pointer)
     participant CPP as ⚙️ C++ (SoLoud DSP)
 
-    Note over UI: Pengguna pilih Template "Monster"
+    Note over UI: UI dikunci di 120fps
     UI->>FFI: setFilterParam(filterId, pitchId, 0.5)
     
-    Note over FFI: Synchronous Execution
-    FFI->>CPP: Tulis nilai 0.5 ke pointer memori
-    CPP->>CPP: Kalkulasi algoritma TimePitch di Buffer
-    CPP-->>FFI: Kembalikan status eksekusi (Void/Int)
+    Note over FFI: SYNCHRONOUS MEMORY ACCESS <br> (Bypass OS Queue)
+    FFI->>CPP: Tulis/Timpa nilai 0.5 langsung ke alamat memory C++
+    CPP->>CPP: Kalkulasi ulang Buffer secara matematis
+    CPP-->>FFI: Pointer tersimpan
     
-    FFI-->>UI: Lanjut eksekusi rendering UI
-    Note over CPP: Audio Thread memutar buffer termodifikasi ke Speaker
+    FFI-->>UI: Lanjut eksekusi UI (Latensi < 1ms)
+    Note over CPP: Audio Thread (Terpisah) melempar buffer termodifikasi ke Speaker
 ```
 
 ## 5. Struktur Direktori Proyek
