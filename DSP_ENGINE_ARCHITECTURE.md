@@ -20,7 +20,7 @@ Berikut adalah algoritma bagaimana mesin C++ memanipulasi *Buffer* suara mentah 
 graph TD
     A[(File Audio .wav / .m4a)] -->|Read/Decode| B[Audio Data Buffer <br> 44100 Hz PCM]
     
-    subgraph DSP Algorithm Pipeline (C++)
+    subgraph DSP_Pipeline ["DSP Algorithm Pipeline (C++)"]
     B --> C{Active Filter?}
     C -- No Filter --> G[Master Mixer]
     
