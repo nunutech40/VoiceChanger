@@ -18,29 +18,18 @@ Berikut adalah algoritma bagaimana mesin C++ memanipulasi *Buffer* suara mentah 
 
 ```mermaid
 graph TD
-    subgraph Input_Infra ["1. Input Infrastructure (Akses Disk)"]
-        A[(File Audio di Disk)] -->|I/O Read| B[SoLoud Engine Memory]
-        B -->|Decode| C[PCM Audio Buffer]
-    end
+    Input[File Audio di Disk] --> Mem[Memory Buffer C++]
     
-    subgraph DSP_Pipeline ["2. DSP Algorithm Pipeline (C++)"]
-        C --> D{Ada Filter Aktif?}
-        D -- Tidak --> H[Master Mixer]
-        
-        D -- Pitch/Speed --> E[Resampling Algorithm]
-        E --> F[Time-Stretch Algorithm]
-        
-        D -- Echo/Reverb --> G[Convolution Delay]
-        
-        F --> H
-        G --> H
-    end
+    Mem --> Pitch[Efek Pitch/Speed]
+    Mem --> Reverb[Efek Reverb]
+    Mem --> Polos[Tanpa Efek]
     
-    subgraph Output_Infra ["3. Output Infrastructure (OS & Hardware)"]
-        H -->|Audio Termodifikasi| I[OS Audio API <br> CoreAudio / OpenSL]
-        I --> J[DAC Converter]
-        J --> K((Speaker Fisik))
-    end
+    Pitch --> Mix[Master Mixer]
+    Reverb --> Mix
+    Polos --> Mix
+    
+    Mix --> API[OS Audio API]
+    API --> Speaker[Hardware Speaker]
 ```
 
 ### Penjelasan Algoritma (Step-by-Step)
