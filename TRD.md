@@ -15,6 +15,7 @@ Berikut adalah daftar lengkap teknologi yang digunakan beserta alasan penggunaan
 *   **BLoC / Cubit (`flutter_bloc`):** *State Management* utama yang merespons secara reaktif setiap pergeseran *slider*.
 *   **Dependency Injection (`get_it`):** Kontainer sentral untuk injeksi otomatis *Repository* dan *UseCase*.
 *   **Audio Recording (`record`):** Pustaka untuk menangkap buffer data suara mentah dari mikrofon OS.
+*   **Platform Permissions (`permission_handler`):** Menangani lapis keamanan OS Android/iOS untuk meminta akses wajib ke *Microphone* agar *engine* bisa merekam suara.
 
 ### 2.2 Audio Engine (Lapisan DSP & Kecerdasan Pemrosesan)
 *   **C++ (SoLoud Engine):** *Engine* audio *open-source* berkinerja tinggi yang memproses manipulasi gelombang audio (DSP) murni secara lokal di dalam memori perangkat.
@@ -107,6 +108,6 @@ VoiceChanger/
 │
 ├── PRD.md              
 ├── TRD.md              
-├── MVP.md              
+├── EXECUTION_PLAN.md              
 └── README.md
 ```
