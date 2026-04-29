@@ -37,15 +37,15 @@ graph TD
     H --> I((Speaker Fisik))
 ```
 
-### Penjelasan Langkah-demi-Langkah (Step-by-Step)
-Biar nggak pusing baca diagramnya, ini rincian algoritmanya:
+### Penjelasan Algoritma (Step-by-Step)
+Berikut adalah rincian teknis dari algoritma pemrosesan yang terjadi di dalam *pipeline* DSP:
 
-1. **Input (Buffer PCM):** File suara yang udah direkam (misal: `.m4a`) dibaca dan dipecah jadi titik-titik data mentah (*PCM Audio Buffer*) dengan standar 44.100 titik data per detik.
-2. **Pengecekan Filter:** Sistem C++ nanya, *"Ada efek yang lagi nyala nggak nih?"* Kalau *slider* masih 0 semua, suara langsung diterusin ke *Mixer* tanpa diubah.
-3. **Resampling Algorithm (Pitch):** Kalau efek "Monster" nyala, algoritma ini merapatkan titik-titik data tadi. Efeknya? Nada suara jadi lebih tinggi (atau direnggangkan jadi lebih rendah).
-4. **Time-Stretch Algorithm (Kompensasi):** Hukum fisika suara: kalau titik dirapatkan, lagu lu jadi makin pendek/cepet kelar (kayak muter kaset dipercepat). Nah, algoritma *Time-Stretch* dipanggil buat nahan durasi lagu biar tetep sama, walaupun nadanya naik/turun!
-5. **Convolution (Echo/Reverb):** Kalau lu nyalain efek gema, algoritma akan membuat *copy* dari sinyal suara lu, memudarkan volumenya (*decay*), dan menumpuknya berulang-ulang dalam jeda milidetik buat meniru efek pantulan dinding gua.
-6. **Master Mixer & Output:** Semua suara efek itu diaduk jadi satu aliran data final, lalu dilempar ke *Digital-to-Analog Converter (DAC)* biar bisa diterjemahkan jadi getaran fisik di *Speaker* HP.
+1. **Input (Buffer PCM):** File audio sumber (`.wav` atau `.m4a`) di-*decode* dan dikonversi menjadi *PCM (Pulse-Code Modulation) Audio Buffer* mentah, umumnya beroperasi pada *sample rate* 44.100 Hz.
+2. **Evaluasi Filter (Bypass Check):** Mesin mengevaluasi status parameter filter yang aktif. Jika seluruh parameter berada pada nilai *default* (misal: nilai *pitch* = 1.0, *reverb* = 0.0), maka rantai pemrosesan DSP diabaikan (*bypassed*) dan aliran data diteruskan langsung ke blok *Mixer*.
+3. **Resampling Algorithm (Pitch Shifting):** Jika parameter *Pitch* dimodifikasi, algoritma akan melakukan interpolasi untuk memanipulasi rasio jarak antar sampel (*resampling*). Perapatan sampel akan menghasilkan frekuensi nada yang lebih tinggi, sedangkan perenggangan sampel akan menghasilkan frekuensi nada yang lebih rendah.
+4. **Time-Stretch Algorithm (Kompensasi Durasi):** Modifikasi jarak antar sampel pada tahap *resampling* secara alamiah akan mengubah durasi total pemutaran (menciptakan efek percepatan atau perlambatan). Algoritma *Time-Stretch* diaktifkan untuk mengkompensasi hal ini dengan memanipulasi *windowing* pada gelombang suara, memastikan durasi *playback* tetap konstan meskipun terjadi pergeseran *pitch*.
+5. **Convolution (Echo/Reverb):** Pemrosesan gema akustik (*spatial audio*) dilakukan dengan menduplikasi sinyal sumber, mengaplikasikan pelemahan amplitudo (*decay*), dan menjumlahkan sinyal-sinyal pantulan tersebut kembali ke *buffer* utama dengan berbagai rentang jeda waktu (*delay*) untuk mensimulasikan karakteristik ruang.
+6. **Master Mixer & Output:** Seluruh *buffer* audio yang telah melalui pemrosesan efek diakumulasikan ke dalam satu saluran *output* final. Aliran data digital ini kemudian diteruskan menuju *Digital-to-Analog Converter* (DAC) pada arsitektur sistem operasi untuk ditransmisikan sebagai getaran akustik fisik melalui *Speaker*.
 
 ---
 
