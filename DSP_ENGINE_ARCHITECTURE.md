@@ -10,7 +10,32 @@ Fokus dokumen ini adalah membedah bagaimana aplikasi **AuraVoice** memproses man
 **SoLoud** adalah mesin audio (Audio Engine) tingkat rendah (*low-level*) berkinerja tinggi yang ditulis murni menggunakan **C++**. Engine ini awalnya dirancang untuk *game development* karena kemampuannya memproses ratusan aliran audio secara *real-time* tanpa membuat CPU bekerja berat.
 
 Dalam konteks *Voice Changer* kita, SoLoud bertindak sebagai **DSP (Digital Signal Processor)**. 
-Ketika *user* menggeser *slider Pitch* (Nada), SoLoud tidak merekam ulang suaranya. Ia secara matematis merapatkan atau merenggangkan jarak antar titik-titik sampel gelombang suara (Resampling & Pitch Shifting) secara *on-the-fly* sebelum dikirim ke perangkat *Speaker* fisik.
+Ketika *user* menggeser *slider Pitch* (Nada), SoLoud tidak merekam ulang suaranya. Ia menjalankan algoritma matematika untuk merapatkan atau merenggangkan jarak antar titik-titik sampel gelombang suara (Resampling & Pitch Shifting) secara *on-the-fly* sebelum dikirim ke perangkat *Speaker* fisik.
+
+### Alur Algoritma DSP (Digital Signal Processing)
+
+Berikut adalah algoritma bagaimana mesin C++ memanipulasi *Buffer* suara mentah menjadi efek (misal: "Monster" atau "Tupai") dalam hitungan mikrodetik:
+
+```mermaid
+graph TD
+    A[(File Audio .wav / .m4a)] -->|Read/Decode| B[Audio Data Buffer <br> 44100 Hz PCM]
+    
+    subgraph DSP Algorithm Pipeline (C++)
+    B --> C{Active Filter?}
+    C -- No Filter --> G[Master Mixer]
+    
+    C -- Pitch Shift --> D[Resampling Algorithm <br> Merapatkan/Meregangkan <br> Jarak Sampel]
+    D --> E[Time-Stretch Algorithm <br> Mempertahankan Durasi <br> meski Pitch Berubah]
+    
+    C -- Reverb / Echo --> F[Convolution/Delay Algorithm <br> Memantulkan Sinyal <br> Berdasarkan Waktu]
+    
+    E --> G
+    F --> G
+    end
+    
+    G --> H[DAC <br> Digital-to-Analog Converter]
+    H --> I((Speaker Hardware))
+```
 
 ---
 
