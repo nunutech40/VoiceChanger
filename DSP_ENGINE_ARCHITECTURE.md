@@ -18,24 +18,34 @@ Berikut adalah algoritma bagaimana mesin C++ memanipulasi *Buffer* suara mentah 
 
 ```mermaid
 graph TD
-    A[(File Audio .wav / .m4a)] -->|Read/Decode| B[Audio Data Buffer <br> 44100 Hz PCM]
+    A[(File Audio Mentah)] -->|Decode| B[Buffer PCM 44100Hz]
     
     subgraph DSP_Pipeline ["DSP Algorithm Pipeline (C++)"]
-    B --> C{Active Filter?}
-    C -- No Filter --> G[Master Mixer]
+    B --> C{Ada Filter Aktif?}
+    C -- Tidak --> G[Master Mixer]
     
-    C -- Pitch Shift --> D[Resampling Algorithm <br> Merapatkan/Meregangkan <br> Jarak Sampel]
-    D --> E[Time-Stretch Algorithm <br> Mempertahankan Durasi <br> meski Pitch Berubah]
+    C -- Pitch/Speed --> D[Resampling Algorithm]
+    D --> E[Time-Stretch Algorithm]
     
-    C -- Reverb / Echo --> F[Convolution/Delay Algorithm <br> Memantulkan Sinyal <br> Berdasarkan Waktu]
+    C -- Echo/Reverb --> F[Convolution Delay]
     
     E --> G
     F --> G
     end
     
-    G --> H[DAC <br> Digital-to-Analog Converter]
-    H --> I((Speaker Hardware))
+    G --> H[DAC Converter]
+    H --> I((Speaker Fisik))
 ```
+
+### Penjelasan Langkah-demi-Langkah (Step-by-Step)
+Biar nggak pusing baca diagramnya, ini rincian algoritmanya:
+
+1. **Input (Buffer PCM):** File suara yang udah direkam (misal: `.m4a`) dibaca dan dipecah jadi titik-titik data mentah (*PCM Audio Buffer*) dengan standar 44.100 titik data per detik.
+2. **Pengecekan Filter:** Sistem C++ nanya, *"Ada efek yang lagi nyala nggak nih?"* Kalau *slider* masih 0 semua, suara langsung diterusin ke *Mixer* tanpa diubah.
+3. **Resampling Algorithm (Pitch):** Kalau efek "Monster" nyala, algoritma ini merapatkan titik-titik data tadi. Efeknya? Nada suara jadi lebih tinggi (atau direnggangkan jadi lebih rendah).
+4. **Time-Stretch Algorithm (Kompensasi):** Hukum fisika suara: kalau titik dirapatkan, lagu lu jadi makin pendek/cepet kelar (kayak muter kaset dipercepat). Nah, algoritma *Time-Stretch* dipanggil buat nahan durasi lagu biar tetep sama, walaupun nadanya naik/turun!
+5. **Convolution (Echo/Reverb):** Kalau lu nyalain efek gema, algoritma akan membuat *copy* dari sinyal suara lu, memudarkan volumenya (*decay*), dan menumpuknya berulang-ulang dalam jeda milidetik buat meniru efek pantulan dinding gua.
+6. **Master Mixer & Output:** Semua suara efek itu diaduk jadi satu aliran data final, lalu dilempar ke *Digital-to-Analog Converter (DAC)* biar bisa diterjemahkan jadi getaran fisik di *Speaker* HP.
 
 ---
 
