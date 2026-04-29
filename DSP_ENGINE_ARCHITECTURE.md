@@ -18,34 +18,40 @@ Berikut adalah algoritma bagaimana mesin C++ memanipulasi *Buffer* suara mentah 
 
 ```mermaid
 graph TD
-    A[(File Audio Mentah)] -->|Decode| B[Buffer PCM 44100Hz]
-    
-    subgraph DSP_Pipeline ["DSP Algorithm Pipeline (C++)"]
-    B --> C{Ada Filter Aktif?}
-    C -- Tidak --> G[Master Mixer]
-    
-    C -- Pitch/Speed --> D[Resampling Algorithm]
-    D --> E[Time-Stretch Algorithm]
-    
-    C -- Echo/Reverb --> F[Convolution Delay]
-    
-    E --> G
-    F --> G
+    subgraph Input_Infra ["1. Input Infrastructure (Akses Disk)"]
+        A[(File Audio di Disk)] -->|I/O Read| B[SoLoud Engine Memory]
+        B -->|Decode| C[PCM Audio Buffer]
     end
     
-    G --> H[DAC Converter]
-    H --> I((Speaker Fisik))
+    subgraph DSP_Pipeline ["2. DSP Algorithm Pipeline (C++)"]
+        C --> D{Ada Filter Aktif?}
+        D -- Tidak --> H[Master Mixer]
+        
+        D -- Pitch/Speed --> E[Resampling Algorithm]
+        E --> F[Time-Stretch Algorithm]
+        
+        D -- Echo/Reverb --> G[Convolution Delay]
+        
+        F --> H
+        G --> H
+    end
+    
+    subgraph Output_Infra ["3. Output Infrastructure (OS & Hardware)"]
+        H -->|Audio Termodifikasi| I[OS Audio API <br> CoreAudio / OpenSL]
+        I --> J[DAC Converter]
+        J --> K((Speaker Fisik))
+    end
 ```
 
 ### Penjelasan Algoritma (Step-by-Step)
 Berikut adalah rincian teknis dari algoritma pemrosesan yang terjadi di dalam *pipeline* DSP:
 
-1. **Input (Buffer PCM):** File audio sumber (`.wav` atau `.m4a`) di-*decode* dan dikonversi menjadi *PCM (Pulse-Code Modulation) Audio Buffer* mentah, umumnya beroperasi pada *sample rate* 44.100 Hz.
-2. **Evaluasi Filter (Bypass Check):** Mesin mengevaluasi status parameter filter yang aktif. Jika seluruh parameter berada pada nilai *default* (misal: nilai *pitch* = 1.0, *reverb* = 0.0), maka rantai pemrosesan DSP diabaikan (*bypassed*) dan aliran data diteruskan langsung ke blok *Mixer*.
-3. **Resampling Algorithm (Pitch Shifting):** Jika parameter *Pitch* dimodifikasi, algoritma akan melakukan interpolasi untuk memanipulasi rasio jarak antar sampel (*resampling*). Perapatan sampel akan menghasilkan frekuensi nada yang lebih tinggi, sedangkan perenggangan sampel akan menghasilkan frekuensi nada yang lebih rendah.
-4. **Time-Stretch Algorithm (Kompensasi Durasi):** Modifikasi jarak antar sampel pada tahap *resampling* secara alamiah akan mengubah durasi total pemutaran (menciptakan efek percepatan atau perlambatan). Algoritma *Time-Stretch* diaktifkan untuk mengkompensasi hal ini dengan memanipulasi *windowing* pada gelombang suara, memastikan durasi *playback* tetap konstan meskipun terjadi pergeseran *pitch*.
-5. **Convolution (Echo/Reverb):** Pemrosesan gema akustik (*spatial audio*) dilakukan dengan menduplikasi sinyal sumber, mengaplikasikan pelemahan amplitudo (*decay*), dan menjumlahkan sinyal-sinyal pantulan tersebut kembali ke *buffer* utama dengan berbagai rentang jeda waktu (*delay*) untuk mensimulasikan karakteristik ruang.
-6. **Master Mixer & Output:** Seluruh *buffer* audio yang telah melalui pemrosesan efek diakumulasikan ke dalam satu saluran *output* final. Aliran data digital ini kemudian diteruskan menuju *Digital-to-Analog Converter* (DAC) pada arsitektur sistem operasi untuk ditransmisikan sebagai getaran akustik fisik melalui *Speaker*.
+1. **Input Infrastructure (Akses Disk & Decode):** SoLoud Engine melakukan operasi I/O (Input/Output) untuk membaca file audio mentah (`.wav` atau `.m4a`) dari penyimpanan fisik perangkat. File ini di-*decode* dan ditarik ke dalam *Memory Buffer* C++ sebagai *PCM (Pulse-Code Modulation)*.
+2. **Evaluasi Filter (Bypass Check):** Sinyal audio dievaluasi. Jika seluruh parameter *slider* berada pada nilai *default*, pemrosesan algoritma diabaikan dan aliran data diteruskan langsung ke *Master Mixer*.
+3. **Resampling & Time-Stretch (DSP Pitch):** Jika parameter *Pitch* dimodifikasi, algoritma **Resampling** akan melakukan interpolasi untuk memanipulasi rasio jarak antar sampel (mengubah frekuensi/nada). Secara bersamaan, algoritma **Time-Stretch** memanipulasi *windowing* gelombang agar durasi lagu tetap konstan (tidak berubah jadi cepat/lambat akibat pergeseran *pitch*).
+4. **Convolution (DSP Echo/Reverb):** Pemrosesan gema akustik dilakukan dengan menduplikasi sinyal sumber, mengaplikasikan pelemahan amplitudo (*decay*), dan menjumlahkan sinyal pantulan tersebut ke *buffer* dengan rentang jeda waktu tertentu untuk mensimulasikan karakteristik ruang.
+5. **Output Infrastructure (Akses OS & Hardware):** Seluruh hasil pemrosesan DSP digabung di *Master Mixer*. C++ SoLoud kemudian mengirim data sinyal suara baru ini ke **OS Audio API** tingkat rendah (*CoreAudio* untuk iOS atau *OpenSL ES/Oboe* untuk Android).
+6. **Digital-to-Analog (DAC):** OS meneruskan data digital tersebut ke *chip* DAC perangkat keras keras untuk ditransmisikan sebagai tegangan listrik (analog), yang akhirnya menggetarkan membran **Speaker Fisik**.
 
 ---
 
