@@ -57,26 +57,9 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
         ),
         centerTitle: true,
       ),
-      body: BlocConsumer<VoiceTunerCubit, VoiceTunerState>(
-        listener: (context, state) {
-          if (state.exportMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.exportMessage!,
-                  style: const TextStyle(color: Colors.white),
-                ),
-                backgroundColor: const Color(0xFF10B981), // Emerald green for success
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-            );
-          }
-        },
+      body: BlocBuilder<VoiceTunerCubit, VoiceTunerState>(
         builder: (context, state) {
-          return Stack(
-            children: [
-              Padding(
+          return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -268,36 +251,8 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                     const SizedBox(height: 40),
                   ],
                 ),
-              ),
-              
-              // Export / Save Button
-              Positioned(
-                top: 20,
-                right: 20,
-                child: state.isExporting
-                  ? const CircularProgressIndicator(color: Color(0xFF3B82F6))
-                  : IconButton(
-                      iconSize: 28,
-                      color: state.exportMessage != null && state.exportMessage!.contains('Saved') 
-                          ? const Color(0xFF10B981) 
-                          : const Color(0xFF1A1A1C),
-                      icon: Icon(
-                        state.exportMessage != null && state.exportMessage!.contains('Saved')
-                            ? Icons.check_circle
-                            : Icons.download
-                      ),
-                      onPressed: state.exportMessage != null && state.exportMessage!.contains('Saved')
-                          ? null // Disable if already saved
-                          : () {
-                              context.read<VoiceTunerCubit>().exportAudio();
-                            },
-                      tooltip: state.exportMessage != null && state.exportMessage!.contains('Saved')
-                          ? 'Downloaded'
-                          : 'Save Audio',
-                    ),
-              ),
-            ],
-          );
+                ),
+              );
         },
       ),
     );

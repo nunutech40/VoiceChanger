@@ -3,14 +3,12 @@ import '../../domain/entities/audio_filter_entity.dart';
 import '../../domain/usecases/apply_voice_filter_usecase.dart';
 import '../../domain/usecases/play_audio_usecase.dart';
 import '../../domain/usecases/stop_audio_usecase.dart';
-import '../../domain/usecases/export_audio_usecase.dart';
 import 'voice_tuner_state.dart';
 
 class VoiceTunerCubit extends Cubit<VoiceTunerState> {
   final PlayAudioUseCase _playAudioUseCase;
   final StopAudioUseCase _stopAudioUseCase;
   final ApplyVoiceFilterUseCase _applyVoiceFilterUseCase;
-  final ExportAudioUseCase _exportAudioUseCase;
 
   String? _currentAudioPath;
 
@@ -18,7 +16,6 @@ class VoiceTunerCubit extends Cubit<VoiceTunerState> {
     this._playAudioUseCase,
     this._stopAudioUseCase,
     this._applyVoiceFilterUseCase,
-    this._exportAudioUseCase,
   ) : super(VoiceTunerState.initial());
 
   void setAudioPath(String path) {
@@ -61,27 +58,6 @@ class VoiceTunerCubit extends Cubit<VoiceTunerState> {
     
     if (state.isPlaying) {
       _applyVoiceFilterUseCase.execute(newFilter);
-    }
-  }
-
-  Future<void> exportAudio() async {
-    if (_currentAudioPath == null) return;
-    
-    emit(state.copyWith(isExporting: true, exportMessage: null));
-    try {
-      final exportedPath = await _exportAudioUseCase.execute(
-        _currentAudioPath!, 
-        state.currentFilter,
-      );
-      emit(state.copyWith(
-        isExporting: false, 
-        exportMessage: 'Audio Saved:\n$exportedPath',
-      ));
-    } catch (e) {
-      emit(state.copyWith(
-        isExporting: false, 
-        exportMessage: 'Error Exporting Audio',
-      ));
     }
   }
 }

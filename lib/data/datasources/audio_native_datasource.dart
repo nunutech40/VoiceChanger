@@ -98,26 +98,6 @@ class AudioNativeDataSource {
     soloud.setRelativePlaySpeed(_currentSoundHandle!, speed);
   }
 
-  /// Mengekspor file audio ke penyimpanan internal (Mock DSP Render)
-  Future<String> exportAudio(String sourcePath, double pitch, double speed) async {
-    // Catatan: Karena flutter_soloud murni playback engine, ia tidak bisa melakukan
-    // re-encoding file. Di tahap produksi, bagian ini butuh 'ffmpeg_kit_flutter'
-    // untuk melakukan pitch shift & time stretch permanen pada file .m4a.
-    // Sebagai MVP & demi menjaga iOS Build, kita mensimulasikan proses rendering.
-    
-    final extDir = await getApplicationDocumentsDirectory();
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final exportPath = '${extDir.path}/AuraVoice_$timestamp.wav';
-    
-    // Simulasi waktu tunggu rendering
-    await Future.delayed(const Duration(seconds: 2));
-    
-    final file = File(sourcePath);
-    await file.copy(exportPath);
-    
-    return exportPath;
-  }
-
   /// Mengambil riwayat file audio
   Future<List<String>> getAudioHistory() async {
     final extDir = await getApplicationDocumentsDirectory();

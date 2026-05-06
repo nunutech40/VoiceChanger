@@ -42,11 +42,6 @@ class AudioRepositoryImpl implements IAudioRepository {
   }
 
   @override
-  Future<String> exportAudio(String sourcePath, double pitch, double speed) async {
-    return await _dataSource.exportAudio(sourcePath, pitch, speed);
-  }
-
-  @override
   Future<List<String>> getAudioHistory() async {
     return await _dataSource.getAudioHistory();
   }

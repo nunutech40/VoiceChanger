@@ -23,9 +23,6 @@ abstract class IAudioRepository {
   /// Mengubah pitch dan speed suara menggunakan DSP C++ FFI
   void applyPitchAndSpeed(double pitch, double speed);
 
-  /// Menyimpan hasil audio ke memori perangkat
-  Future<String> exportAudio(String sourcePath, double pitch, double speed);
-
   /// Mengambil daftar path rekaman audio (history)
   Future<List<String>> getAudioHistory();
 
