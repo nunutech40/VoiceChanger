@@ -146,4 +146,12 @@ class AudioNativeDataSource {
     }
     return null;
   }
+
+  /// Menghapus file audio
+  Future<void> deleteAudio(String path) async {
+    final file = File(path);
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
 }

@@ -55,4 +55,9 @@ class AudioRepositoryImpl implements IAudioRepository {
   Future<String?> pickExternalAudio() async {
     return await _dataSource.pickExternalAudio();
   }
+
+  @override
+  Future<void> deleteAudio(String path) async {
+    await _dataSource.deleteAudio(path);
+  }
 }

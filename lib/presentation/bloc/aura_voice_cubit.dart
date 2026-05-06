@@ -5,6 +5,7 @@ import '../../domain/usecases/get_audio_history_usecase.dart';
 import '../../domain/usecases/pick_external_audio_usecase.dart';
 import '../../domain/usecases/start_recording_usecase.dart';
 import '../../domain/usecases/stop_recording_usecase.dart';
+import '../../domain/usecases/delete_audio_usecase.dart';
 import 'aura_voice_state.dart';
 
 class AuraVoiceCubit extends Cubit<AuraVoiceState> {
@@ -13,6 +14,7 @@ class AuraVoiceCubit extends Cubit<AuraVoiceState> {
   final StopRecordingUseCase _stopRecordingUseCase;
   final GetAudioHistoryUseCase _getAudioHistoryUseCase;
   final PickExternalAudioUseCase _pickExternalAudioUseCase;
+  final DeleteAudioUseCase _deleteAudioUseCase;
 
   AuraVoiceCubit(
     this._initEngineUseCase,
@@ -20,6 +22,7 @@ class AuraVoiceCubit extends Cubit<AuraVoiceState> {
     this._stopRecordingUseCase,
     this._getAudioHistoryUseCase,
     this._pickExternalAudioUseCase,
+    this._deleteAudioUseCase,
   ) : super(AuraVoiceInitial());
 
   /// Inisialisasi engine C++ saat aplikasi dibuka
@@ -83,5 +86,15 @@ class AuraVoiceCubit extends Cubit<AuraVoiceState> {
   /// Kembali ke halaman rekaman awal
   void resetToReady() {
     fetchHistory();
+  }
+
+  Future<void> deleteAudio(String path) async {
+    try {
+      await _deleteAudioUseCase.execute(path);
+      await fetchHistory(); // Refresh history
+    } catch (e) {
+      emit(AuraVoiceError("Gagal menghapus file: ${e.toString()}"));
+      await fetchHistory();
+    }
   }
 }

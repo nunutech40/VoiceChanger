@@ -31,4 +31,7 @@ abstract class IAudioRepository {
 
   /// Membuka file picker untuk import audio eksternal
   Future<String?> pickExternalAudio();
+
+  /// Menghapus file audio berdasarkan path
+  Future<void> deleteAudio(String path);
 }

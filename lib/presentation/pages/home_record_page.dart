@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import '../bloc/aura_voice_cubit.dart';
 import '../bloc/aura_voice_state.dart';
 import 'playback_template_page.dart';
+import 'full_history_page.dart';
 
 class HomeRecordPage extends StatelessWidget {
   const HomeRecordPage({super.key});
@@ -130,15 +131,38 @@ class HomeRecordPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(30, 30, 30, 10),
-                        child: Text(
-                          "Recent Recordings",
-                          style: TextStyle(
-                            color: Color(0xFF1A1A1C), // Dark text
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30, 30, 30, 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Recent Recordings",
+                              style: TextStyle(
+                                color: Color(0xFF1A1A1C), // Dark text
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (state is AuraVoiceReady && state.historyFiles.length > 3)
+                              TextButton(
+                                onPressed: () {
+                                  // Navigate to full history
+                                  // For now, we can just push a new page that passes the state
+                                  // Or a dedicated FullHistoryPage
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const FullHistoryPage()),
+                                  ).then((_) {
+                                    context.read<AuraVoiceCubit>().resetToReady();
+                                  });
+                                },
+                                child: const Text(
+                                  "See All",
+                                  style: TextStyle(color: Color(0xFF3B82F6), fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       Expanded(
@@ -167,64 +191,84 @@ class HomeRecordPage extends StatelessWidget {
         );
       }
 
+      // Limit to 3 items on home page
+      final displayCount = state.historyFiles.length > 3 ? 3 : state.historyFiles.length;
+
       return ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        itemCount: state.historyFiles.length,
+        itemCount: displayCount,
         itemBuilder: (context, index) {
           final path = state.historyFiles[index];
           final fileName = p.basename(path);
           final date = File(path).lastModifiedSync();
           final isExported = fileName.startsWith('AuraVoice_');
           
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFF3F4F6)), // Light gray border
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x05000000), // Extremely subtle shadow
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
-                )
-              ]
+          return Dismissible(
+            key: Key(path),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444), // Red for delete
+                borderRadius: BorderRadius.circular(20),
+              ),
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: const Icon(Icons.delete_outline, color: Colors.white),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              leading: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isExported ? const Color(0xFFECFDF5) : const Color(0xFFEFF6FF), // Soft green or blue
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  isExported ? Icons.check_circle_outline : Icons.audiotrack,
-                  color: isExported ? const Color(0xFF10B981) : const Color(0xFF3B82F6), // Green or Blue icon
-                ),
+            onDismissed: (direction) {
+              context.read<AuraVoiceCubit>().deleteAudio(path);
+            },
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFF3F4F6)), // Light gray border
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x05000000), // Extremely subtle shadow
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  )
+                ]
               ),
-              title: Text(
-                fileName,
-                style: const TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.w600, fontSize: 15),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: Text(
-                  "${date.day}/${date.month}/${date.year} • ${date.hour}:${date.minute.toString().padLeft(2, '0')}",
-                  style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 13),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                leading: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isExported ? const Color(0xFFECFDF5) : const Color(0xFFEFF6FF), // Soft green or blue
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isExported ? Icons.check_circle_outline : Icons.audiotrack,
+                    color: isExported ? const Color(0xFF10B981) : const Color(0xFF3B82F6), // Green or Blue icon
+                  ),
                 ),
+                title: Text(
+                  fileName,
+                  style: const TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.w600, fontSize: 15),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    "${date.day}/${date.month}/${date.year} • ${date.hour}:${date.minute.toString().padLeft(2, '0')}",
+                    style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 13),
+                  ),
+                ),
+                trailing: const Icon(Icons.chevron_right, color: Color(0xFFD1D5DB)),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PlaybackTemplatePage(audioPath: path)),
+                  ).then((_) {
+                    context.read<AuraVoiceCubit>().resetToReady();
+                  });
+                },
               ),
-              trailing: const Icon(Icons.chevron_right, color: Color(0xFFD1D5DB)),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => PlaybackTemplatePage(audioPath: path)),
-                ).then((_) {
-                  context.read<AuraVoiceCubit>().resetToReady();
-                });
-              },
             ),
           );
         },
