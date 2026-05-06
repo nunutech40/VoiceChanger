@@ -25,4 +25,10 @@ abstract class IAudioRepository {
 
   /// Menyimpan hasil audio ke memori perangkat
   Future<String> exportAudio(String sourcePath, double pitch, double speed);
+
+  /// Mengambil daftar path rekaman audio (history)
+  Future<List<String>> getAudioHistory();
+
+  /// Membuka file picker untuk import audio eksternal
+  Future<String?> pickExternalAudio();
 }

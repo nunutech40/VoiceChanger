@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -103,5 +104,34 @@ class AudioNativeDataSource {
     await file.copy(exportPath);
     
     return exportPath;
+  }
+
+  /// Mengambil riwayat file audio
+  Future<List<String>> getAudioHistory() async {
+    final extDir = await getApplicationDocumentsDirectory();
+    final files = extDir.listSync().where((item) {
+      return item.path.endsWith('.m4a') || item.path.endsWith('.wav') || item.path.endsWith('.mp3');
+    }).map((item) => item.path).toList();
+    
+    files.sort((a, b) => File(b).lastModifiedSync().compareTo(File(a).lastModifiedSync()));
+    return files;
+  }
+
+  /// Membuka file picker untuk memilih audio eksternal
+  Future<String?> pickExternalAudio() async {
+    FilePickerResult? result = await FilePicker.pickFiles(
+      type: FileType.audio,
+    );
+
+    if (result != null && result.files.single.path != null) {
+      final path = result.files.single.path!;
+      final extDir = await getApplicationDocumentsDirectory();
+      final fileName = result.files.single.name;
+      final newPath = '${extDir.path}/$fileName';
+      
+      await File(path).copy(newPath);
+      return newPath;
+    }
+    return null;
   }
 }

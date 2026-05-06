@@ -9,6 +9,8 @@ import 'package:voice_changer/domain/usecases/play_audio_usecase.dart';
 import 'package:voice_changer/domain/usecases/stop_audio_usecase.dart';
 import 'package:voice_changer/domain/usecases/apply_voice_filter_usecase.dart';
 import 'package:voice_changer/domain/usecases/export_audio_usecase.dart';
+import 'package:voice_changer/domain/usecases/get_audio_history_usecase.dart';
+import 'package:voice_changer/domain/usecases/pick_external_audio_usecase.dart';
 import 'package:voice_changer/presentation/bloc/aura_voice_cubit.dart';
 import 'package:voice_changer/presentation/bloc/voice_tuner_cubit.dart';
 
@@ -16,7 +18,7 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   // BLoC / Cubit
-  sl.registerFactory(() => AuraVoiceCubit(sl(), sl(), sl()));
+  sl.registerFactory(() => AuraVoiceCubit(sl(), sl(), sl(), sl(), sl()));
   sl.registerFactory(() => VoiceTunerCubit(sl(), sl(), sl(), sl()));
 
   // UseCases
@@ -27,6 +29,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => StopAudioUseCase(sl()));
   sl.registerLazySingleton(() => ApplyVoiceFilterUseCase(sl()));
   sl.registerLazySingleton(() => ExportAudioUseCase(sl()));
+  sl.registerLazySingleton(() => GetAudioHistoryUseCase(sl()));
+  sl.registerLazySingleton(() => PickExternalAudioUseCase(sl()));
 
   // Data Sources
   sl.registerLazySingleton<AudioNativeDataSource>(
