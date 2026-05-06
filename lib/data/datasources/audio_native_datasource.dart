@@ -11,6 +11,7 @@ class AudioNativeDataSource {
   
   AudioSource? _currentAudioSource;
   SoundHandle? _currentSoundHandle;
+  String? _loadedAudioPath;
 
   /// Menginisialisasi SoLoud Engine (C++ DSP).
   Future<void> initEngine() async {
@@ -26,6 +27,8 @@ class AudioNativeDataSource {
     await stopAudio();
     if (_currentAudioSource != null) {
       await soloud.disposeSource(_currentAudioSource!);
+      _currentAudioSource = null;
+      _loadedAudioPath = null;
     }
     if (soloud.isInitialized) {
       soloud.deinit();
@@ -66,7 +69,15 @@ class AudioNativeDataSource {
     final soloud = SoLoud.instance;
     await stopAudio(); // Stop any existing playback
 
-    _currentAudioSource = await soloud.loadFile(path);
+    // Jika file yang akan diputar berbeda dengan yang ada di memori, load ulang
+    if (_loadedAudioPath != path || _currentAudioSource == null) {
+      if (_currentAudioSource != null) {
+        await soloud.disposeSource(_currentAudioSource!);
+      }
+      _currentAudioSource = await soloud.loadFile(path);
+      _loadedAudioPath = path;
+    }
+
     _currentSoundHandle = await soloud.play(_currentAudioSource!);
   }
 

@@ -113,7 +113,7 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "Ready for modulation",
+                                  "Select a preset below to start modulating",
                                   style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
                                 ),
                               ],
@@ -260,12 +260,22 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                   ? const CircularProgressIndicator(color: Color(0xFF8B5CF6))
                   : IconButton(
                       iconSize: 28,
-                      color: Colors.white,
-                      icon: const Icon(Icons.download),
-                      onPressed: () {
-                        context.read<VoiceTunerCubit>().exportAudio();
-                      },
-                      tooltip: 'Save Audio',
+                      color: state.exportMessage != null && state.exportMessage!.contains('Saved') 
+                          ? Colors.greenAccent 
+                          : Colors.white,
+                      icon: Icon(
+                        state.exportMessage != null && state.exportMessage!.contains('Saved')
+                            ? Icons.check_circle
+                            : Icons.download
+                      ),
+                      onPressed: state.exportMessage != null && state.exportMessage!.contains('Saved')
+                          ? null // Disable if already saved
+                          : () {
+                              context.read<VoiceTunerCubit>().exportAudio();
+                            },
+                      tooltip: state.exportMessage != null && state.exportMessage!.contains('Saved')
+                          ? 'Downloaded'
+                          : 'Save Audio',
                     ),
               ),
             ],
