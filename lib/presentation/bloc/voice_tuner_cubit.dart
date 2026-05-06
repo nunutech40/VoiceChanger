@@ -1,5 +1,87 @@
-// TODO: Placeholder for BLoC/Cubit
-// This will manage the state of the voice tuner UI and react to slider changes.
-class VoiceTunerCubit {
-  // This will call the UseCase and emit new states.
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/entities/audio_filter_entity.dart';
+import '../../domain/usecases/apply_voice_filter_usecase.dart';
+import '../../domain/usecases/play_audio_usecase.dart';
+import '../../domain/usecases/stop_audio_usecase.dart';
+import '../../domain/usecases/export_audio_usecase.dart';
+import 'voice_tuner_state.dart';
+
+class VoiceTunerCubit extends Cubit<VoiceTunerState> {
+  final PlayAudioUseCase _playAudioUseCase;
+  final StopAudioUseCase _stopAudioUseCase;
+  final ApplyVoiceFilterUseCase _applyVoiceFilterUseCase;
+  final ExportAudioUseCase _exportAudioUseCase;
+
+  String? _currentAudioPath;
+
+  VoiceTunerCubit(
+    this._playAudioUseCase,
+    this._stopAudioUseCase,
+    this._applyVoiceFilterUseCase,
+    this._exportAudioUseCase,
+  ) : super(VoiceTunerState.initial());
+
+  void setAudioPath(String path) {
+    _currentAudioPath = path;
+  }
+
+  Future<void> play() async {
+    if (_currentAudioPath == null) return;
+    
+    // Play the audio
+    await _playAudioUseCase.execute(_currentAudioPath!);
+    
+    // Apply current filter synchronously
+    _applyVoiceFilterUseCase.execute(state.currentFilter);
+    
+    emit(state.copyWith(isPlaying: true));
+  }
+
+  Future<void> stop() async {
+    await _stopAudioUseCase.execute();
+    emit(state.copyWith(isPlaying: false));
+  }
+
+  void applyTemplate(AudioFilterEntity filter) {
+    // Update State
+    emit(state.copyWith(currentFilter: filter));
+    
+    // If it's playing, apply immediately via FFI
+    if (state.isPlaying) {
+      _applyVoiceFilterUseCase.execute(filter);
+    } else {
+      // Auto play when template is pressed (based on PRD requirements)
+      play();
+    }
+  }
+
+  void applyCustomTune(double pitch, double speed) {
+    final newFilter = state.currentFilter.copyWith(pitch: pitch, speed: speed);
+    emit(state.copyWith(currentFilter: newFilter));
+    
+    if (state.isPlaying) {
+      _applyVoiceFilterUseCase.execute(newFilter);
+    }
+  }
+
+  Future<void> exportAudio() async {
+    if (_currentAudioPath == null) return;
+    
+    emit(state.copyWith(isExporting: true, exportMessage: null));
+    try {
+      final exportedPath = await _exportAudioUseCase.execute(
+        _currentAudioPath!, 
+        state.currentFilter,
+      );
+      emit(state.copyWith(
+        isExporting: false, 
+        exportMessage: 'Audio Saved:\n$exportedPath',
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isExporting: false, 
+        exportMessage: 'Error Exporting Audio',
+      ));
+    }
+  }
 }

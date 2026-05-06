@@ -9,7 +9,14 @@ abstract class AuraVoiceState extends Equatable {
 
 class AuraVoiceInitial extends AuraVoiceState {}
 
-class AuraVoiceReady extends AuraVoiceState {}
+class AuraVoiceReady extends AuraVoiceState {
+  final List<String> historyFiles;
+
+  const AuraVoiceReady({this.historyFiles = const []});
+
+  @override
+  List<Object?> get props => [historyFiles];
+}
 
 class AuraVoiceRecording extends AuraVoiceState {}
 

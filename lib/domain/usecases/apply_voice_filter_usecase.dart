@@ -1,10 +1,12 @@
-// TODO: Placeholder for Domain Use Case
-// This will handle the business logic of applying the voice filter.
+import '../entities/audio_filter_entity.dart';
+import '../repositories/i_audio_repository.dart';
+
 class ApplyVoiceFilterUseCase {
-  // final IAudioRepository repository;
-  // ApplyVoiceFilterUseCase(this.repository);
+  final IAudioRepository repository;
+
+  ApplyVoiceFilterUseCase(this.repository);
   
-  // Future<void> execute(AudioFilterEntity filter) async {
-  //   return await repository.applyFilter(filter);
-  // }
+  void execute(AudioFilterEntity filter) {
+    repository.applyPitchAndSpeed(filter.pitch, filter.speed);
+  }
 }

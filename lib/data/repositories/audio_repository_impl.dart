@@ -25,4 +25,24 @@ class AudioRepositoryImpl implements IAudioRepository {
   Future<String?> stopRecording() async {
     return await _dataSource.stopRecording();
   }
+
+  @override
+  Future<void> playAudio(String path) async {
+    await _dataSource.playAudio(path);
+  }
+
+  @override
+  Future<void> stopAudio() async {
+    await _dataSource.stopAudio();
+  }
+
+  @override
+  void applyPitchAndSpeed(double pitch, double speed) {
+    _dataSource.applyPitchAndSpeed(pitch, speed);
+  }
+
+  @override
+  Future<String> exportAudio(String sourcePath, double pitch, double speed) async {
+    return await _dataSource.exportAudio(sourcePath, pitch, speed);
+  }
 }

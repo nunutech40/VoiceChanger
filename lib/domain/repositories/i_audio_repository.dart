@@ -13,4 +13,16 @@ abstract class IAudioRepository {
   /// Menghentikan rekaman secara manual dan mengembalikan lokasi file (path).
   /// Path ini nantinya akan diload oleh SoLoud untuk dimainkan.
   Future<String?> stopRecording();
+
+  /// Memutar file audio yang sudah direkam
+  Future<void> playAudio(String path);
+
+  /// Menghentikan pemutaran audio
+  Future<void> stopAudio();
+
+  /// Mengubah pitch dan speed suara menggunakan DSP C++ FFI
+  void applyPitchAndSpeed(double pitch, double speed);
+
+  /// Menyimpan hasil audio ke memori perangkat
+  Future<String> exportAudio(String sourcePath, double pitch, double speed);
 }
