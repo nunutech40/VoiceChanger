@@ -23,7 +23,8 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
   void initState() {
     super.initState();
     // Langsung putar audio dengan filter normal saat halaman dibuka
-    context.read<VoiceTunerCubit>().play(widget.audioPath);
+    context.read<VoiceTunerCubit>().setAudioPath(widget.audioPath);
+    context.read<VoiceTunerCubit>().play();
   }
 
   @override
@@ -128,7 +129,7 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                       height: 120,
                       child: Center(
                         child: FakeVisualizer(
-                          isActive: state.isPlaying,
+                          isPlaying: state.isPlaying,
                           activeColor: const Color(0xFF8B5CF6),
                           inactiveColor: Colors.white.withOpacity(0.1),
                         ),
@@ -281,11 +282,11 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
     required IconData icon,
     required AudioFilterEntity filter,
   }) {
-    final isSelected = state.activeFilter == filter;
+    final isSelected = state.currentFilter == filter;
     
     return GestureDetector(
       onTap: () {
-        context.read<VoiceTunerCubit>().applyFilter(filter);
+        context.read<VoiceTunerCubit>().applyTemplate(filter);
       },
       child: Column(
         children: [

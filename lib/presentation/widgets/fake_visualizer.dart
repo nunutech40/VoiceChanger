@@ -5,7 +5,15 @@ import 'package:flutter/material.dart';
 
 class FakeVisualizer extends StatefulWidget {
   final bool isPlaying;
-  const FakeVisualizer({super.key, required this.isPlaying});
+  final Color activeColor;
+  final Color inactiveColor;
+
+  const FakeVisualizer({
+    super.key, 
+    required this.isPlaying,
+    this.activeColor = Colors.greenAccent,
+    this.inactiveColor = Colors.grey,
+  });
 
   @override
   State<FakeVisualizer> createState() => _FakeVisualizerState();
@@ -93,10 +101,10 @@ class _FakeVisualizerState extends State<FakeVisualizer> with SingleTickerProvid
           height: 100 * level + 10,
           margin: const EdgeInsets.symmetric(horizontal: 2),
           decoration: BoxDecoration(
-            color: widget.isPlaying ? Colors.greenAccent : Colors.grey.withOpacity(0.3),
+            color: widget.isPlaying ? widget.activeColor : widget.inactiveColor,
             borderRadius: BorderRadius.circular(4),
             boxShadow: widget.isPlaying ? [
-              const BoxShadow(color: Colors.greenAccent, blurRadius: 10, spreadRadius: 1)
+              BoxShadow(color: widget.activeColor, blurRadius: 10, spreadRadius: 1)
             ] : [],
           ),
         );

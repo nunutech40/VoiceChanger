@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path_provider/package:path_provider.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../../domain/usecases/init_engine_usecase.dart';
@@ -46,7 +46,7 @@ class AuraVoiceCubit extends Cubit<AuraVoiceState> {
   }
 
   Future<void> pickExternalFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.audio,
     );
 

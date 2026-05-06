@@ -19,17 +19,12 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
   void initState() {
     super.initState();
     final currentState = context.read<VoiceTunerCubit>().state;
-    _pitch = currentState.activeFilter.pitchShift;
-    _speed = currentState.activeFilter.speedModifier;
+    _pitch = currentState.currentFilter.pitch;
+    _speed = currentState.currentFilter.speed;
   }
 
   void _applyCustomFilter() {
-    final customFilter = AudioFilterEntity(
-      name: "Custom",
-      pitchShift: _pitch,
-      speedModifier: _speed,
-    );
-    context.read<VoiceTunerCubit>().applyFilter(customFilter);
+    context.read<VoiceTunerCubit>().applyCustomTune(_pitch, _speed);
   }
 
   @override
