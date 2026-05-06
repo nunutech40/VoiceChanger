@@ -43,8 +43,9 @@ class AudioNativeDataSource {
       throw Exception('Akses Microphone ditolak oleh pengguna.');
     }
 
-    final tempDir = await getTemporaryDirectory();
-    _currentRecordingPath = '${tempDir.path}/aura_voice_temp.m4a';
+    final extDir = await getApplicationDocumentsDirectory();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    _currentRecordingPath = '${extDir.path}/Recording_$timestamp.m4a';
 
     if (await _audioRecorder.hasPermission()) {
       await _audioRecorder.start(
