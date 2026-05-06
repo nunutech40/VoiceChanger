@@ -179,29 +179,45 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                           ),
                           const SizedBox(height: 20),
                           // Custom Tuner Button
-                          SizedBox(
-                            width: double.infinity,
-                            height: 56,
-                            child: OutlinedButton.icon(
-                              icon: const Icon(Icons.tune, color: Color(0xFF3B82F6)),
-                              label: const Text(
-                                "Advanced Tuner",
-                                style: TextStyle(color: Color(0xFF3B82F6), fontSize: 16, fontWeight: FontWeight.w600),
+                          Builder(builder: (context) {
+                            final isCustom = state.currentFilter != AudioFilterEntity.normal() &&
+                                             state.currentFilter != AudioFilterEntity.chipmunk() &&
+                                             state.currentFilter != AudioFilterEntity.monster();
+                            
+                            return SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: OutlinedButton.icon(
+                                icon: Icon(
+                                  isCustom ? Icons.tune : Icons.tune_outlined, 
+                                  color: isCustom ? Colors.white : const Color(0xFF3B82F6)
+                                ),
+                                label: Text(
+                                  isCustom ? "Custom Active" : "Advanced Tuner",
+                                  style: TextStyle(
+                                    color: isCustom ? Colors.white : const Color(0xFF3B82F6), 
+                                    fontSize: 16, 
+                                    fontWeight: FontWeight.w600
+                                  ),
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: isCustom 
+                                      ? BorderSide.none 
+                                      : const BorderSide(color: Color(0xFFBFDBFE), width: 1.5),
+                                  backgroundColor: isCustom ? const Color(0xFF3B82F6) : const Color(0xFFEFF6FF),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  elevation: isCustom ? 4 : 0,
+                                  shadowColor: const Color(0x403B82F6),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const CustomTunerPage()),
+                                  );
+                                },
                               ),
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Color(0xFFBFDBFE), width: 1.5),
-                                backgroundColor: const Color(0xFFEFF6FF),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                elevation: 0,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const CustomTunerPage()),
-                                );
-                              },
-                            ),
-                          ),
+                            );
+                          }),
                         ],
                       ),
                     ),
