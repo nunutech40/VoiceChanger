@@ -251,7 +251,6 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                     const SizedBox(height: 40),
                   ],
                 ),
-                ),
               );
         },
       ),
