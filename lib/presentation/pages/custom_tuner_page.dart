@@ -30,18 +30,18 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0E), // US Market dark theme
+      backgroundColor: const Color(0xFFF9FAFB), // Match light theme
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1A1A1C), size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Advanced Tuner',
           style: TextStyle(
-            color: Colors.white,
+            color: Color(0xFF1A1A1C),
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -64,7 +64,7 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
                   min: 0.5,
                   max: 2.0,
                   icon: Icons.graphic_eq,
-                  color: const Color(0xFF3B82F6),
+                  color: const Color(0xFF3B82F6), // Primary Blue
                   onChanged: (val) {
                     setState(() => _pitch = val);
                     _applyCustomFilter();
@@ -80,7 +80,7 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
                   min: 0.5,
                   max: 2.0,
                   icon: Icons.speed,
-                  color: const Color(0xFF8B5CF6),
+                  color: const Color(0xFF10B981), // Emerald Green
                   onChanged: (val) {
                     setState(() => _speed = val);
                     _applyCustomFilter();
@@ -95,8 +95,8 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
                   height: 56,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.05),
-                      foregroundColor: Colors.white,
+                      backgroundColor: const Color(0xFFF3F4F6), // Soft gray
+                      foregroundColor: const Color(0xFFEF4444), // Soft red text
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -136,9 +136,16 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: const Color(0xFFF3F4F6)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x05000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,11 +163,11 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
               const SizedBox(width: 12),
               Text(
                 title,
-                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                style: const TextStyle(color: Color(0xFF1A1A1C), fontSize: 16, fontWeight: FontWeight.w600),
               ),
               const Spacer(),
               Text(
-                value.toStringAsFixed(2) + "x",
+                "${value.toStringAsFixed(2)}x",
                 style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],
@@ -169,12 +176,12 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
           SliderTheme(
             data: SliderThemeData(
               activeTrackColor: color,
-              inactiveTrackColor: Colors.white.withOpacity(0.1),
-              thumbColor: Colors.white,
+              inactiveTrackColor: const Color(0xFFE5E7EB), // Soft gray track
+              thumbColor: Colors.white, // White thumb
               overlayColor: color.withOpacity(0.2),
               trackHeight: 6,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12, elevation: 4), // Larger thumb with shadow
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
             ),
             child: Slider(
               value: value,
@@ -188,8 +195,8 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(min.toStringAsFixed(1), style: const TextStyle(color: Colors.white30, fontSize: 12)),
-                Text(max.toStringAsFixed(1), style: const TextStyle(color: Colors.white30, fontSize: 12)),
+                Text(min.toStringAsFixed(1), style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12)),
+                Text(max.toStringAsFixed(1), style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12)),
               ],
             ),
           ),

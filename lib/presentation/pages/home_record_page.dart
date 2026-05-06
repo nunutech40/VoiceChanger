@@ -12,14 +12,14 @@ class HomeRecordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0E), // Very dark sleek background
+      backgroundColor: const Color(0xFFF9FAFB), // Clean off-white background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
           'AuraVoice',
           style: TextStyle(
-            color: Colors.white,
+            color: Color(0xFF1A1A1C), // Dark text
             fontSize: 24,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
@@ -27,7 +27,7 @@ class HomeRecordPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.drive_folder_upload, color: Colors.white70),
+            icon: const Icon(Icons.drive_folder_upload, color: Color(0xFF3B82F6)),
             onPressed: () {
               context.read<AuraVoiceCubit>().pickExternalFile();
             },
@@ -73,35 +73,26 @@ class HomeRecordPage extends StatelessWidget {
                   onTapCancel: () => context.read<AuraVoiceCubit>().stopRecording(),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    width: isRecording ? 180 : 150,
-                    height: isRecording ? 180 : 150,
+                    width: isRecording ? 160 : 140,
+                    height: isRecording ? 160 : 140,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: isRecording
-                          ? LinearGradient(
-                              colors: [Colors.redAccent.shade400, Colors.deepOrangeAccent],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            )
-                          : const LinearGradient(
-                              colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
+                      color: isRecording ? const Color(0xFF3B82F6) : Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: isRecording 
-                            ? Colors.redAccent.withOpacity(0.5) 
-                            : const Color(0xFF3B82F6).withOpacity(0.3),
-                          blurRadius: isRecording ? 40 : 20,
-                          spreadRadius: isRecording ? 10 : 5,
+                            ? const Color(0xFF3B82F6).withOpacity(0.4) 
+                            : const Color(0xFF8E8E93).withOpacity(0.15),
+                          blurRadius: isRecording ? 30 : 20,
+                          spreadRadius: isRecording ? 8 : 2,
+                          offset: const Offset(0, 8),
                         )
                       ],
                     ),
                     child: Icon(
                       isRecording ? Icons.mic : Icons.mic_none,
-                      color: Colors.white,
-                      size: 60,
+                      color: isRecording ? Colors.white : const Color(0xFF3B82F6),
+                      size: 50,
                     ),
                   ),
                 ),
@@ -110,7 +101,7 @@ class HomeRecordPage extends StatelessWidget {
               Text(
                 isRecording ? "Recording... Release to process" : "Hold to record",
                 style: TextStyle(
-                  color: isRecording ? Colors.redAccent.shade100 : Colors.white54,
+                  color: isRecording ? const Color(0xFF3B82F6) : const Color(0xFF8E8E93),
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.5,
@@ -123,11 +114,18 @@ class HomeRecordPage extends StatelessWidget {
                 child: Container(
                   width: double.infinity,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF161618),
+                    color: Colors.white, // Clean white history sheet
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
+                      topLeft: Radius.circular(32),
+                      topRight: Radius.circular(32),
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0x0A000000), // Very subtle top shadow
+                        blurRadius: 20,
+                        offset: Offset(0, -5),
+                      )
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +135,7 @@ class HomeRecordPage extends StatelessWidget {
                         child: Text(
                           "Recent Recordings",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Color(0xFF1A1A1C), // Dark text
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -164,7 +162,7 @@ class HomeRecordPage extends StatelessWidget {
           child: Text(
             "No recordings yet.\nImport a file or start recording.",
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white30, fontSize: 14),
+            style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14),
           ),
         );
       }
@@ -181,34 +179,44 @@ class HomeRecordPage extends StatelessWidget {
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.03),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFF3F4F6)), // Light gray border
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x05000000), // Extremely subtle shadow
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                )
+              ]
             ),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               leading: Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isExported ? Colors.greenAccent.withOpacity(0.1) : const Color(0xFF8B5CF6).withOpacity(0.1),
+                  color: isExported ? const Color(0xFFECFDF5) : const Color(0xFFEFF6FF), // Soft green or blue
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isExported ? Icons.check_circle : Icons.audiotrack,
-                  color: isExported ? Colors.greenAccent : const Color(0xFF8B5CF6),
+                  isExported ? Icons.check_circle_outline : Icons.audiotrack,
+                  color: isExported ? const Color(0xFF10B981) : const Color(0xFF3B82F6), // Green or Blue icon
                 ),
               ),
               title: Text(
                 fileName,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
+                style: const TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.w600, fontSize: 15),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              subtitle: Text(
-                "${date.day}/${date.month}/${date.year} • ${date.hour}:${date.minute.toString().padLeft(2, '0')}",
-                style: const TextStyle(color: Colors.white38, fontSize: 12),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: Text(
+                  "${date.day}/${date.month}/${date.year} • ${date.hour}:${date.minute.toString().padLeft(2, '0')}",
+                  style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 13),
+                ),
               ),
-              trailing: const Icon(Icons.chevron_right, color: Colors.white30),
+              trailing: const Icon(Icons.chevron_right, color: Color(0xFFD1D5DB)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -224,6 +232,6 @@ class HomeRecordPage extends StatelessWidget {
     }
     
     // When recording, show blurred/dimmed version
-    return const Center(child: Text("Waiting...", style: TextStyle(color: Colors.white30)));
+    return const Center(child: Text("Processing...", style: TextStyle(color: Color(0xFF8E8E93))));
   }
 }

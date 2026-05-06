@@ -29,13 +29,26 @@ class AuraVoiceApp extends StatelessWidget {
         title: 'AuraVoice',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          brightness: Brightness.dark,
-          scaffoldBackgroundColor: Colors.black,
-          colorScheme: const ColorScheme.dark(
-            primary: Colors.greenAccent,
-            secondary: Colors.cyanAccent,
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: const Color(0xFFF9FAFB), // Soft off-white
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF3B82F6), // Clean bright blue
+            secondary: Color(0xFF60A5FA), // Soft blue for accents
+            surface: Colors.white,
           ),
           useMaterial3: true,
+          fontFamily: 'SF Pro Display', // Safe fallback for iOS-like feel if SF Pro isn't available, or use default which is system font
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            iconTheme: IconThemeData(color: Color(0xFF1A1A1C)), // Dark icons
+            titleTextStyle: TextStyle(
+              color: Color(0xFF1A1A1C),
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
+            ),
+          ),
         ),
         home: const HomeRecordPage(),
       ),

@@ -39,18 +39,18 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
     final fileName = p.basename(widget.audioPath);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0E), // Match home screen
+      backgroundColor: const Color(0xFFF9FAFB), // Match home screen light theme
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1A1A1C), size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Tuner',
           style: TextStyle(
-            color: Colors.white,
+            color: Color(0xFF1A1A1C),
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -66,7 +66,7 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                   state.exportMessage!,
                   style: const TextStyle(color: Colors.white),
                 ),
-                backgroundColor: const Color(0xFF8B5CF6),
+                backgroundColor: const Color(0xFF10B981), // Emerald green for success
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
@@ -86,16 +86,23 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.03),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white.withOpacity(0.05)),
+                        border: Border.all(color: const Color(0xFFF3F4F6)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x05000000),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          )
+                        ],
                       ),
                       child: Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF3B82F6).withOpacity(0.1),
+                              color: const Color(0xFFEFF6FF),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: const Icon(Icons.graphic_eq, color: Color(0xFF3B82F6)),
@@ -107,14 +114,14 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                               children: [
                                 Text(
                                   fileName,
-                                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(color: Color(0xFF1A1A1C), fontSize: 16, fontWeight: FontWeight.w600),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
+                                const Text(
                                   "Select a preset below to start modulating",
-                                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                                  style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13),
                                 ),
                               ],
                             ),
@@ -130,8 +137,8 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                       child: Center(
                         child: FakeVisualizer(
                           isPlaying: state.isPlaying,
-                          activeColor: const Color(0xFF8B5CF6),
-                          inactiveColor: Colors.white.withOpacity(0.1),
+                          activeColor: const Color(0xFF3B82F6), // Bright blue
+                          inactiveColor: const Color(0xFFE5E7EB), // Soft gray
                         ),
                       ),
                     ),
@@ -142,15 +149,23 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF161618),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(32),
+                        border: Border.all(color: const Color(0xFFF3F4F6)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x05000000),
+                            blurRadius: 15,
+                            offset: Offset(0, 8),
+                          )
+                        ]
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
                             "Voice Presets",
-                            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                            style: TextStyle(color: Color(0xFF1A1A1C), fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 20),
                           Row(
@@ -185,14 +200,16 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                             width: double.infinity,
                             height: 56,
                             child: OutlinedButton.icon(
-                              icon: const Icon(Icons.tune, color: Colors.white),
+                              icon: const Icon(Icons.tune, color: Color(0xFF3B82F6)),
                               label: const Text(
                                 "Advanced Tuner",
-                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                                style: TextStyle(color: Color(0xFF3B82F6), fontSize: 16, fontWeight: FontWeight.w600),
                               ),
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                                side: const BorderSide(color: Color(0xFFBFDBFE), width: 1.5),
+                                backgroundColor: const Color(0xFFEFF6FF),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                elevation: 0,
                               ),
                               onPressed: () {
                                 Navigator.push(
@@ -226,15 +243,16 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                                colors: [Color(0xFF60A5FA), Color(0xFF3B82F6)],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
-                                  color: const Color(0xFF3B82F6).withOpacity(0.3),
+                                  color: Color(0x403B82F6), // 25% opacity blue
                                   blurRadius: 20,
                                   spreadRadius: 5,
+                                  offset: Offset(0, 8),
                                 )
                               ],
                             ),
@@ -257,12 +275,12 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
                 top: 20,
                 right: 20,
                 child: state.isExporting
-                  ? const CircularProgressIndicator(color: Color(0xFF8B5CF6))
+                  ? const CircularProgressIndicator(color: Color(0xFF3B82F6))
                   : IconButton(
                       iconSize: 28,
                       color: state.exportMessage != null && state.exportMessage!.contains('Saved') 
-                          ? Colors.greenAccent 
-                          : Colors.white,
+                          ? const Color(0xFF10B981) 
+                          : const Color(0xFF1A1A1C),
                       icon: Icon(
                         state.exportMessage != null && state.exportMessage!.contains('Saved')
                             ? Icons.check_circle
@@ -304,21 +322,25 @@ class _PlaybackTemplatePageState extends State<PlaybackTemplatePage> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF8B5CF6) : Colors.white.withOpacity(0.05),
+              color: isSelected ? const Color(0xFF3B82F6) : Colors.white,
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? Colors.transparent : const Color(0xFFE5E7EB),
+                width: 1.5,
+              ),
               boxShadow: isSelected
-                  ? [BoxShadow(color: const Color(0xFF8B5CF6).withOpacity(0.4), blurRadius: 15, spreadRadius: 2)]
+                  ? const [BoxShadow(color: Color(0x403B82F6), blurRadius: 15, spreadRadius: 2, offset: Offset(0, 6))]
                   : [],
             ),
-            child: Icon(icon, color: isSelected ? Colors.white : Colors.white54, size: 28),
+            child: Icon(icon, color: isSelected ? Colors.white : const Color(0xFF9CA3AF), size: 28),
           ),
           const SizedBox(height: 8),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white54,
+              color: isSelected ? const Color(0xFF3B82F6) : const Color(0xFF6B7280),
               fontSize: 13,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             ),
           ),
         ],
