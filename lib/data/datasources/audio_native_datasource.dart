@@ -45,12 +45,12 @@ class AudioNativeDataSource {
 
     final extDir = await getApplicationDocumentsDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    _currentRecordingPath = '${extDir.path}/Recording_$timestamp.m4a';
+    _currentRecordingPath = '${extDir.path}/Recording_$timestamp.wav';
 
     if (await _audioRecorder.hasPermission()) {
       await _audioRecorder.start(
         const RecordConfig(
-          encoder: AudioEncoder.aacLc,
+          encoder: AudioEncoder.wav,
           bitRate: 128000,
           sampleRate: 44100,
         ),
@@ -107,7 +107,7 @@ class AudioNativeDataSource {
     
     final extDir = await getApplicationDocumentsDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final exportPath = '${extDir.path}/AuraVoice_$timestamp.m4a';
+    final exportPath = '${extDir.path}/AuraVoice_$timestamp.wav';
     
     // Simulasi waktu tunggu rendering
     await Future.delayed(const Duration(seconds: 2));
