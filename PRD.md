@@ -1,58 +1,62 @@
 # Product Requirements Document (PRD): AuraVoice (Voice Changer)
 
-## 1. Pendahuluan
-### 1.1 Tujuan Produk (GET ATTENTION)
-Tujuan utama aplikasi ini **bukanlah** sekadar alat pengubah suara biasa, melainkan sebagai **Pabrik Konten (Content Factory)** dan **Showcase Portofolio Tingkat Tinggi**.
-1.  **TikTok/Reels (Komedik & Visual):** Menghasilkan *output* konten suara *absurd* (tupai, monster, alien) dengan *user interface* yang dirancang *over-engineered*. Tampilan akan dibuat seolah-olah pengguna sedang mengoperasikan mesin *hacker* audio *high-tech* demi memancing rasa penasaran penonton.
-2.  **X/Twitter (Tech Flexing):** Menjadi bahan *thread* edukasi arsitektur perangkat lunak. Aplikasi ini adalah alat untuk memamerkan integrasi tingkat rendah (*Dart FFI, C++ SoLoud Engine, Digital Signal Processing, Zero-Latency Architecture*), memancing interaksi (*engagement*) dan diskusi dari sesama *Software Engineer*.
+## 1. Introduction
+### 1.1 Product Goal (The "Flex")
+The primary goal of AuraVoice is **not** just to be another voice-changing app. It is designed as a **Content Factory** and a **High-Tier Portfolio Showcase** targeting the US tech market.
+1. **X (Twitter) & Indie Hackers (Tech Flexing):** The app serves as a prime example of building high-performance, over-engineered software architecture. It demonstrates low-level integration (*Dart FFI, C++ SoLoud Engine, Digital Signal Processing, Zero-Latency Architecture*) and Strict Clean Architecture to attract engagement and discussion from top-tier US Software Engineers and Startup Founders.
+2. **US Startup Market (Aesthetics & UX):** The UI is designed with a sleek, premium, Apple-esque aesthetic (Dark Mode `#0D0D0E`, Glassmorphism, subtle gradients). It proves that Flutter can deliver beautiful, native-feeling experiences without compromising on rendering performance.
 
-### 1.2 Target Pengguna (Audience Konten)
-*   *Followers* di TikTok yang menyukai konten komedi dan visual aplikasi yang "terlihat rumit tapi lucu".
-*   *Tech-Enthusiast* dan *Developer* di ekosistem X (Twitter) yang lapar akan bedah teknologi *Cross-Platform* x *Native C++*.
-*   Perekrut (sebagai portofolio *engineering* yang solid).
+### 1.2 Target Audience
+* **Startup Founders & Recruiters in the US** looking for robust software engineering portfolios.
+* **Tech-Enthusiasts and Developers** on X (Twitter) hungry for cross-platform and Native C++ integration deep-dives.
 
-## 2. Fitur Utama (Core Features)
+## 2. Core Features
 
 ### 2.1 One-Tap Audio Recording
-Pengguna menekan dan menahan tombol untuk merekam suara (maksimal durasi 60 detik) yang akan langsung diproses dan disimpan di memori sementara.
+Users can hold the sleek microphone button to record audio (up to 60 seconds), which is instantly processed and saved to the app's document directory.
 
-### 2.2 Template Presets
-Setelah rekaman selesai, pengguna dihadapkan pada antarmuka *Playback* dengan deretan tombol Template. Jika tombol ditekan, suara akan langsung dimodifikasi:
-*   **🐿 Chipmunk (Tupai):** Suara kecil melengking dan cepat.
-*   **👹 Monster:** Suara sangat nge-bass, berat, dan sedikit bergema.
-*   **🤖 Robot:** Suara normal namun memiliki distorsi flanger/logam.
-*   **🦇 Gua Hantu:** Suara yang dipenuhi *Reverb* dan *Echo* yang memantul di ruangan besar.
+### 2.2 Audio Import (File Picker)
+Users can import existing audio files (`.m4a`, `.mp3`, `.wav`) directly from their device storage using the native OS file picker.
 
-### 2.3 Custom Tuning (Voice Modulator)
-Pengguna dapat masuk ke halaman *Tuner* di mana deretan *slider* akan memuat posisi (nilai parameter) sesuai dengan *template* yang terakhir aktif. Pengguna bisa melakukan *tweak* pada:
-*   **Pitch (Nada)**
-*   **Speed (Kecepatan)**
-*   **Reverb (Gema)**
-*   **Echo (Pantulan)**
+### 2.3 Recording History
+The home screen features a glassmorphic bottom sheet that persistently displays the history of all recorded and imported audio files, allowing users to jump straight into modifying past recordings.
 
-### 2.4 User Flow
+### 2.4 Template Presets & Playback
+When a recording is finished or selected from history, users enter the *Playback Tuner*. Tapping a template instantly modifies the sound via zero-latency C++ FFI:
+* **Normal:** Raw audio.
+* **Chipmunk:** Fast, high-pitched.
+* **Monster:** Deep, heavy bass.
+
+### 2.5 Advanced Tuner
+Users can enter the *Advanced Tuner* page to manually tweak the parameters that were set by the templates:
+* **Pitch Shift**
+* **Speed (Playback Rate)**
+
+### 2.6 User Flow
 ```mermaid
 graph TD
-    A[Start: Home Screen] --> B(Hold to Record Audio)
-    B --> C{Recording Done?}
-    C -- Yes --> D[Playback Screen]
-    D --> E[Select Template Preset<br>e.g. Chipmunk, Monster]
-    E --> F{Listen to Preview}
-    F -- Satisfied --> G(Save / Export Audio)
-    F -- Want to Tweak --> H[Click 'Custom / Tune']
-    H --> I[Custom Tuning Page]
-    I --> J(Adjust Sliders<br>Pitch, Speed, Reverb)
-    J --> F
+    A[Start: Home Screen]
+    A --> B(Hold to Record)
+    A --> C(Import Audio via File Picker)
+    A --> D(Select from History)
+    
+    B --> E[Playback Tuner Screen]
+    C --> E
+    D --> E
+    
+    E --> F[Select Template Preset]
+    F --> G{Listen to Preview}
+    G -- Satisfied --> H(Save / Export Audio)
+    G -- Want to Tweak --> I[Click 'Advanced Tuner']
+    I --> J(Adjust Sliders)
+    J --> G
 ```
 
-## 3. Batasan Minimum Viable Product (MVP)
-Untuk mempercepat rilis v1.0 dan membuktikan kehandalan C++ FFI Audio Engine di Flutter, MVP akan dibatasi secara ketat pada fitur esensial berikut beserta alasannya:
+## 3. Minimum Viable Product (MVP) Boundaries
+To rapidly deploy v1.0 and prove the reliability of the C++ FFI Audio Engine and Clean Architecture in Flutter, the MVP is strictly bound to the following features:
 
-*   **Audio Source Terbatas (Merekam Langsung):** MVP hanya mendukung sumber audio dari hasil rekaman mikrofon langsung (durasi dibatasi 60 detik). 
-    *   *Alasan Kuat:* Menghindari kompleksitas perizinan *file system* OS dan *handling* format audio yang bervariasi jika pengguna mengunggah file mp3/wav dari luar aplikasi.
-*   **Tidak Ada Fitur Live-Monitoring:** Suara hanya bisa dimodifikasi *setelah* rekaman selesai (*Post-Recording Playback*). 
-    *   *Alasan Kuat:* Memproses efek DSP dan menembakkannya kembali ke *earphone/speaker* di saat yang bersamaan dengan mikrofon aktif membutuhkan *audio routing* tingkat rendah yang sangat rentan menyebabkan *feedback loop/storing* (suara dengung melengking), terutama di ekosistem Android yang *hardware*-nya terfragmentasi.
-*   **Template Terbatas (4 Pilihan):** MVP dibatasi pada 4 template utama (Tupai, Monster, Robot, Gua Hantu). 
-    *   *Alasan Kuat:* Empat template ini sudah cukup untuk mendemonstrasikan kapabilitas `SoLoud` tanpa *over-engineering* UI.
-*   **Cinematic Audio Gimmick (Fake Visualizer):** Di layar *Tuner*, akan ada animasi gelombang suara atau *level meter* bergaya *hacker* yang menyala terang.
-    *   *Alasan Kuat (GET ATTENTION):* Karena tujuan utama adalah *gimmick* konten TikTok, layar harus terlihat "sibuk", rumit, dan keren di kamera. Visualizer ini *tidak perlu* sinkron 100% dengan FFT C++ yang berat, melainkan cukup *fake animation* berulang yang reaktif terhadap input suara.
+* **No Live-Monitoring:** Audio modification happens *after* recording/importing (*Post-Recording Playback*). 
+    * *Reason:* Processing DSP effects and routing them back to the speaker simultaneously with an active microphone requires low-level audio routing that is highly prone to feedback loops, especially on fragmented Android hardware.
+* **Template Limits:** MVP is limited to core templates (Normal, Chipmunk, Monster) to demonstrate `SoLoud` capabilities cleanly.
+* **Simulated Export:** Currently, the export button simulates the rendering process. True audio re-encoding requires `ffmpeg_kit_flutter`, which is deferred to v2 to maintain stable iOS build configurations.
+* **Off-Main-Thread Processing:** The visualizer rendering and file I/O operations are offloaded to Dart Isolates / asynchronous background tasks to ensure the main UI thread never drops below 60/120fps.

@@ -1,24 +1,24 @@
 # VoiceChanger 🎙️✨ (AuraVoice)
 
-# VoiceChanger 🎙️✨ (AuraVoice)
+**VoiceChanger (AuraVoice)** is a high-performance **Content Factory** and **Tech-Flexing** portfolio piece built on modern cross-platform mobile architecture (iOS & Android).
 
-**VoiceChanger (AuraVoice)** bukanlah sekadar aplikasi pengubah suara. Ini adalah **Pabrik Konten (Content Factory)** dan sarana **Tech-Flexing** yang dibangun di atas fondasi *mobile cross-platform* (iOS & Android).
+This application is specifically designed with two primary objectives for the **US Market**:
+1. **For X (Twitter) & Indie Hackers:** To showcase the raw power of software architecture by bypassing standard OS method channels, connecting a beautiful **Flutter** interface directly to a **C++ computational brain (SoLoud Engine)** via Dart FFI for zero-latency Digital Signal Processing (DSP).
+2. **For US Startup Founders:** To demonstrate the ability to build premium, sleek, Apple-esque UI/UX (Glassmorphism, Dark Mode) while maintaining 120fps performance by offloading heavy tasks to background Isolates.
 
-Aplikasi ini didesain secara khusus dengan dua tujuan utama:
-1.  **Untuk TikTok:** Menyajikan *UI/UX* yang *over-engineered* bergaya *hacker* audio untuk menciptakan *gimmick* visual yang kuat di depan kamera.
-2.  **Untuk X (Twitter):** Memamerkan kebrutalan arsitektur perangkat lunak dengan menyambungkan antarmuka **Flutter** langsung ke otak komputasi **C++ (SoLoud Engine)** melalui Dart FFI demi mencapai latensi nol (*zero-latency DSP*).
+> 🚀 **THE SECRET SAUCE**
+> While the UI looks incredibly sleek and minimalist, the engine underneath is pure math. By utilizing *Synchronous FFI*, the UI sliders manipulate C++ float pointers directly in memory. No data queuing, no loading states—just pure, instantaneous execution.
 
-> 🤫 **SSSTTT... RAHASIA!**
-> Meskipun aplikasi ini terlihat seperti alat peretas frekuensi rahasia, *engine* utamanya secara murni hanya mengeksekusi operasi matematika terhadap gelombang suara (*Pitch Shifting* dan *Time Stretching*). Namun, arsitektur *Synchronous FFI* yang kami bangun membuat manipulasi ini merespons seketika tanpa *overhead* yang biasa ditemukan pada *MethodChannel*!
+## 🔥 Key Features (The Flex)
+*   **Zero-Latency Audio DSP:** Adjusting sliders directly mutates memory on the C++ side without the usual `MethodChannel` overhead.
+*   **Premium US-Market Aesthetics:** Sleek `#0D0D0E` dark mode, subtle gradients, and glassmorphism elements targeting modern SaaS and startup design languages.
+*   **Clean Architecture (SOLID):** Strictly decoupled Domain, Data, and Presentation layers. Features like File History and Audio Import are orchestrated cleanly via `UseCases`.
+*   **Off-Main-Thread Processing:** Heavy FFT calculations (simulated) and file I/O operations are offloaded from the UI thread to guarantee buttery-smooth 120Hz scrolling.
+*   **Audio Import & History:** Seamlessly import `.m4a`, `.mp3`, or `.wav` files via native file pickers and maintain an accessible history of recordings.
 
-## 🔥 Fitur Utama (The Flex)
-*   **Zero-Latency Audio DSP:** Menggeser *slider* di UI langsung memanipulasi *pointer float* di memori C++. Tidak ada antrean data, tidak ada proses *loading*, murni *real-time*.
-*   **Cinematic Audio Gimmick:** Dilengkapi dengan visualisasi gelombang suara (*fake visualizer*) yang dirender secara terpisah dari *Main Thread* agar terlihat rumit dan canggih di konten video.
-*   **Synchronous FFI Bridge:** Pembuktian konsep bahwa Flutter bisa berjalan secepat aplikasi *Native* jika integrasinya mem- *bypass* arsitektur standar jembatan komunikasi OS.
-*   **Template Absurd:** Preset "sulap" suara instan (Tupai, Monster, Robot) yang siap dipakai untuk membuat *meme* atau video lucu.
-
-## Dokumen Proyek
-Silakan baca dokumen perencanaan arsitektur di bawah ini:
-*   [PRD (Product Requirements Document)](PRD.md) - Rencana produk, fitur, tipe-tipe template, dan target audiens.
-*   [TRD (Technical Requirements Document)](TRD.md) - Arsitektur sistem (*Clean Architecture*), spesifikasi *tech stack*, dan anatomi *C++ FFI Bridge*.
-*   [EXECUTION PLAN](EXECUTION_PLAN.md) - Rencana pengerjaan *checklist step-by-step* eksekusi MVP.
+## Project Documentation
+Please refer to the following architectural documents:
+*   [PRD (Product Requirements Document)](PRD.md) - Product plans, features, market targeting, and UI specifications.
+*   [TRD (Technical Requirements Document)](TRD.md) - Clean Architecture patterns, tech stack, and C++ FFI Bridge anatomy.
+*   [EXECUTION PLAN](EXECUTION_PLAN.md) - Step-by-step checklist of the MVP execution.
+*   [DSP ENGINE ARCHITECTURE](DSP_ENGINE_ARCHITECTURE.md) - Deep dive into the audio pipeline.
