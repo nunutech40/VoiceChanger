@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -86,17 +87,17 @@ class HomeRecordPage extends StatelessWidget {
                   ? 12.0
                   : 24.0;
               final promptBottomGap = isTightHeight
-                  ? 20.0
+                  ? 14.0
                   : isCompactHeight
                   ? 30.0
                   : 44.0;
               final panelHeight = isTightHeight
-                  ? 198.0
+                  ? 188.0
                   : isCompactHeight
                   ? 236.0
                   : 278.0;
               final navHeight = isTightHeight
-                  ? 66.0
+                  ? 62.0
                   : isCompactHeight
                   ? 70.0
                   : 76.0;
@@ -187,7 +188,26 @@ class HomeRecordPage extends StatelessWidget {
                               ),
                               const Spacer(),
                               SizedBox(height: navGap),
-                              _HomeBottomNav(height: navHeight),
+                              _HomeBottomNav(
+                                height: navHeight,
+                                onTunerPressed: () {
+                                  _openLatestRecordingForTuner(context, state);
+                                },
+                                onSettingsPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text(
+                                        'Settings screen is coming next.',
+                                      ),
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: const Color(0xFF172033),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                               SizedBox(
                                 height:
                                     safePadding.bottom +
@@ -204,6 +224,34 @@ class HomeRecordPage extends StatelessWidget {
             },
           );
         },
+      ),
+    );
+  }
+
+  void _openLatestRecordingForTuner(
+    BuildContext context,
+    AuraVoiceState state,
+  ) {
+    if (state is AuraVoiceReady && state.historyFiles.isNotEmpty) {
+      final cubit = context.read<AuraVoiceCubit>();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              PlaybackTemplatePage(audioPath: state.historyFiles.first),
+        ),
+      ).then((_) {
+        cubit.resetToReady();
+      });
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Record or import audio before opening Tuner.'),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF172033),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     );
   }
@@ -629,8 +677,10 @@ class _RecentRecordingsPanel extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: EdgeInsets.zero,
-      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.only(bottom: 14),
+      physics: const BouncingScrollPhysics(
+        parent: AlwaysScrollableScrollPhysics(),
+      ),
       itemCount: displayCount,
       itemBuilder: (context, index) {
         final path = historyFiles[index];
@@ -689,39 +739,84 @@ class _RecentRecordingsPanel extends StatelessWidget {
 }
 
 class _HomeBottomNav extends StatelessWidget {
-  const _HomeBottomNav({required this.height});
+  const _HomeBottomNav({
+    required this.height,
+    required this.onTunerPressed,
+    required this.onSettingsPressed,
+  });
 
   final double height;
+  final VoidCallback onTunerPressed;
+  final VoidCallback onSettingsPressed;
 
   @override
   Widget build(BuildContext context) {
-    return NeonGlassSurface(
+    return Container(
       height: height,
-      borderRadius: 18,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      backgroundColor: const Color(0xCC172033),
-      child: const Row(
-        children: [
-          Expanded(
-            child: _BottomNavItem(
-              icon: Icons.home_rounded,
-              label: 'Home',
-              isActive: true,
-            ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.26),
+            blurRadius: 30,
+            offset: const Offset(0, 16),
           ),
-          Expanded(
-            child: _BottomNavItem(
-              icon: Icons.graphic_eq_rounded,
-              label: 'Tuner',
-            ),
-          ),
-          Expanded(
-            child: _BottomNavItem(
-              icon: Icons.settings_outlined,
-              label: 'Settings',
-            ),
+          BoxShadow(
+            color: AppColors.neonPrimary.withValues(alpha: 0.08),
+            blurRadius: 28,
+            spreadRadius: -2,
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: 0.14),
+                  const Color(0xFF172033).withValues(alpha: 0.72),
+                  Colors.white.withValues(alpha: 0.05),
+                ],
+              ),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.16),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: _BottomNavItem(
+                    icon: Icons.home_rounded,
+                    label: 'Home',
+                    isActive: true,
+                  ),
+                ),
+                Expanded(
+                  child: _BottomNavItem(
+                    icon: Icons.graphic_eq_rounded,
+                    label: 'Tuner',
+                    onTap: onTunerPressed,
+                  ),
+                ),
+                Expanded(
+                  child: _BottomNavItem(
+                    icon: Icons.settings_outlined,
+                    label: 'Settings',
+                    onTap: onSettingsPressed,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -732,60 +827,75 @@ class _BottomNavItem extends StatelessWidget {
     required this.icon,
     required this.label,
     this.isActive = false,
+    this.onTap,
   });
 
   final IconData icon;
   final String label;
   final bool isActive;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final color = isActive ? const Color(0xFF7282FF) : AppColors.textHint;
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 30,
-          height: 28,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            gradient: isActive
-                ? LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.neonPrimary.withValues(alpha: 0.95),
-                      AppColors.neonSecondary.withValues(alpha: 0.95),
-                    ],
-                  )
-                : null,
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: AppColors.neonPrimary.withValues(alpha: 0.28),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Icon(icon, color: isActive ? Colors.white : color, size: 22),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 30,
+              height: 28,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                gradient: isActive
+                    ? LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.neonPrimary.withValues(alpha: 0.95),
+                          AppColors.neonSecondary.withValues(alpha: 0.95),
+                        ],
+                      )
+                    : null,
+                boxShadow: isActive
+                    ? [
+                        BoxShadow(
+                          color: AppColors.neonPrimary.withValues(alpha: 0.28),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Icon(
+                icon,
+                color: isActive ? Colors.white : color,
+                size: 22,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: isActive
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+                fontSize: 11,
+                height: 1,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
-            fontSize: 11,
-            height: 1,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
