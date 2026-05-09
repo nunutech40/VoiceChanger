@@ -65,9 +65,46 @@ class HomeRecordPage extends StatelessWidget {
           return LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
-              final isCompactHeight = constraints.maxHeight < 760;
-              final micSize = width < 380 ? 166.0 : 188.0;
-              final heroGap = isCompactHeight ? 14.0 : 24.0;
+              final safePadding = MediaQuery.paddingOf(context);
+              final availableHeight =
+                  constraints.maxHeight - safePadding.vertical;
+              final isTightHeight = availableHeight < 680;
+              final isCompactHeight = availableHeight < 820;
+              final micSize = isTightHeight
+                  ? 136.0
+                  : isCompactHeight
+                  ? (width < 380 ? 152.0 : 166.0)
+                  : 188.0;
+              final topGap = isTightHeight
+                  ? 14.0
+                  : isCompactHeight
+                  ? 24.0
+                  : 42.0;
+              final heroGap = isTightHeight
+                  ? 8.0
+                  : isCompactHeight
+                  ? 12.0
+                  : 24.0;
+              final promptBottomGap = isTightHeight
+                  ? 20.0
+                  : isCompactHeight
+                  ? 30.0
+                  : 44.0;
+              final panelHeight = isTightHeight
+                  ? 198.0
+                  : isCompactHeight
+                  ? 236.0
+                  : 278.0;
+              final navHeight = isTightHeight
+                  ? 66.0
+                  : isCompactHeight
+                  ? 70.0
+                  : 76.0;
+              final navGap = isTightHeight
+                  ? 10.0
+                  : isCompactHeight
+                  ? 14.0
+                  : 20.0;
 
               return Stack(
                 children: [
@@ -90,7 +127,7 @@ class HomeRecordPage extends StatelessWidget {
                                       .pickExternalFile();
                                 },
                               ),
-                              SizedBox(height: isCompactHeight ? 28 : 42),
+                              SizedBox(height: topGap),
                               NeonMicButton(
                                 size: micSize,
                                 isRecording: isRecording,
@@ -115,9 +152,10 @@ class HomeRecordPage extends StatelessWidget {
                               ),
                               SizedBox(height: heroGap),
                               _RecordPrompt(isRecording: isRecording),
-                              const Spacer(),
+                              SizedBox(height: promptBottomGap),
                               _RecentRecordingsPanel(
                                 state: state,
+                                height: panelHeight,
                                 onSeeAll: () {
                                   final cubit = context.read<AuraVoiceCubit>();
                                   Navigator.push(
@@ -147,11 +185,13 @@ class HomeRecordPage extends StatelessWidget {
                                   });
                                 },
                               ),
-                              const SizedBox(height: 20),
-                              const _HomeBottomNav(),
+                              const Spacer(),
+                              SizedBox(height: navGap),
+                              _HomeBottomNav(height: navHeight),
                               SizedBox(
                                 height:
-                                    MediaQuery.paddingOf(context).bottom + 12,
+                                    safePadding.bottom +
+                                    (isTightHeight ? 6 : 12),
                               ),
                             ],
                           ),
@@ -263,7 +303,6 @@ class _HomeHeader extends StatelessWidget {
         ),
         const Spacer(),
         _HeaderAction(
-          // Cupertino does not ship a crown icon; this is closest to the mockup.
           icon: Icons.workspace_premium_rounded,
           color: AppColors.warning,
           onPressed: onImportPressed,
@@ -306,54 +345,200 @@ class _HeaderAction extends StatelessWidget {
   }
 }
 
-class _RecordPrompt extends StatelessWidget {
+class _RecordPrompt extends StatefulWidget {
   const _RecordPrompt({required this.isRecording});
 
   final bool isRecording;
 
   @override
+  State<_RecordPrompt> createState() => _RecordPromptState();
+}
+
+class _RecordPromptState extends State<_RecordPrompt>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(
-          isRecording ? Icons.graphic_eq_rounded : Icons.keyboard_voice_rounded,
-          color: isRecording ? AppColors.neonPrimary : AppColors.neonSecondary,
-          size: 28,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          isRecording ? 'Recording...' : 'Tap to Record',
-          style: const TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 20,
-            height: 1.15,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          isRecording ? 'tap again to stop' : 'or hold to record',
-          style: const TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 14,
-            height: 1.2,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final pulse = _controller.value;
+        final accent = widget.isRecording
+            ? AppColors.neonPrimary
+            : AppColors.neonSecondary;
+        final glow = 0.16 + (pulse * 0.16);
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Transform.translate(
+              offset: Offset(0, -2 * pulse),
+              child: Container(
+                width: 42,
+                height: 34,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  color: accent.withValues(alpha: 0.12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: accent.withValues(alpha: glow),
+                      blurRadius: 18,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  widget.isRecording
+                      ? Icons.graphic_eq_rounded
+                      : Icons.keyboard_voice_rounded,
+                  color: accent,
+                  size: 24,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            _AnimatedWaveform(
+              progress: pulse,
+              color: accent,
+              isRecording: widget.isRecording,
+            ),
+            const SizedBox(height: 9),
+            ShaderMask(
+              blendMode: BlendMode.srcIn,
+              shaderCallback: (bounds) {
+                final slide = pulse * bounds.width;
+                return LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: const [
+                    AppColors.textPrimary,
+                    Color(0xFF7E88FF),
+                    AppColors.textPrimary,
+                  ],
+                  stops: const [0, 0.5, 1],
+                  transform: _SlidingGradientTransform(slide),
+                ).createShader(bounds);
+              },
+              child: Text(
+                widget.isRecording ? 'Recording...' : 'Tap to Record',
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                  height: 1.15,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              widget.isRecording ? 'tap again to stop' : 'or hold to record',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+                height: 1.2,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        );
+      },
     );
+  }
+}
+
+class _AnimatedWaveform extends StatelessWidget {
+  const _AnimatedWaveform({
+    required this.progress,
+    required this.color,
+    required this.isRecording,
+  });
+
+  final double progress;
+  final Color color;
+  final bool isRecording;
+
+  @override
+  Widget build(BuildContext context) {
+    final baseHeights = isRecording
+        ? const [9.0, 17.0, 25.0, 15.0, 21.0, 11.0]
+        : const [7.0, 12.0, 19.0, 12.0, 16.0, 8.0];
+
+    return SizedBox(
+      height: 26,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: List.generate(baseHeights.length, (index) {
+          final phase = ((progress + (index * 0.18)) % 1.0);
+          final lift = phase < 0.5 ? phase * 2 : (1 - phase) * 2;
+          final height = baseHeights[index] + (lift * (isRecording ? 8 : 5));
+
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            width: 4,
+            height: height,
+            margin: const EdgeInsets.symmetric(horizontal: 2),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(99),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [color, AppColors.neonPrimary.withValues(alpha: 0.72)],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.25),
+                  blurRadius: 10,
+                  spreadRadius: 0.5,
+                ),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _SlidingGradientTransform extends GradientTransform {
+  const _SlidingGradientTransform(this.offset);
+
+  final double offset;
+
+  @override
+  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
+    return Matrix4.translationValues(offset - bounds.width, 0, 0);
   }
 }
 
 class _RecentRecordingsPanel extends StatelessWidget {
   const _RecentRecordingsPanel({
     required this.state,
+    required this.height,
     required this.onSeeAll,
     required this.onDelete,
     required this.onPlay,
   });
 
   final AuraVoiceState state;
+  final double height;
   final VoidCallback onSeeAll;
   final ValueChanged<String> onDelete;
   final ValueChanged<String> onPlay;
@@ -370,7 +555,7 @@ class _RecentRecordingsPanel extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       backgroundColor: const Color(0xB3141B2C),
       child: SizedBox(
-        height: 278,
+        height: height,
         child: Column(
           children: [
             Row(
@@ -504,16 +689,18 @@ class _RecentRecordingsPanel extends StatelessWidget {
 }
 
 class _HomeBottomNav extends StatelessWidget {
-  const _HomeBottomNav();
+  const _HomeBottomNav({required this.height});
+
+  final double height;
 
   @override
   Widget build(BuildContext context) {
-    return const NeonGlassSurface(
-      height: 76,
+    return NeonGlassSurface(
+      height: height,
       borderRadius: 18,
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      backgroundColor: Color(0xCC172033),
-      child: Row(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      backgroundColor: const Color(0xCC172033),
+      child: const Row(
         children: [
           Expanded(
             child: _BottomNavItem(
