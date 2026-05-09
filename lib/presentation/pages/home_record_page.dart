@@ -738,7 +738,7 @@ class _RecentRecordingsPanel extends StatelessWidget {
   }
 }
 
-class _HomeBottomNav extends StatelessWidget {
+class _HomeBottomNav extends StatefulWidget {
   const _HomeBottomNav({
     required this.height,
     required this.onTunerPressed,
@@ -750,9 +750,35 @@ class _HomeBottomNav extends StatelessWidget {
   final VoidCallback onSettingsPressed;
 
   @override
+  State<_HomeBottomNav> createState() => _HomeBottomNavState();
+}
+
+class _HomeBottomNavState extends State<_HomeBottomNav> {
+  int _selectedIndex = 0;
+
+  void _selectTab(int index, VoidCallback? action) {
+    if (_selectedIndex != index) {
+      setState(() => _selectedIndex = index);
+    }
+
+    Future.delayed(const Duration(milliseconds: 120), () {
+      if (!mounted) return;
+      action?.call();
+    });
+
+    if (index != 0) {
+      Future.delayed(const Duration(milliseconds: 760), () {
+        if (mounted) {
+          setState(() => _selectedIndex = 0);
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
+      height: widget.height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
@@ -792,25 +818,28 @@ class _HomeBottomNav extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: _BottomNavItem(
                     icon: Icons.home_rounded,
                     label: 'Home',
-                    isActive: true,
+                    isActive: _selectedIndex == 0,
+                    onTap: () => _selectTab(0, null),
                   ),
                 ),
                 Expanded(
                   child: _BottomNavItem(
                     icon: Icons.graphic_eq_rounded,
                     label: 'Tuner',
-                    onTap: onTunerPressed,
+                    isActive: _selectedIndex == 1,
+                    onTap: () => _selectTab(1, widget.onTunerPressed),
                   ),
                 ),
                 Expanded(
                   child: _BottomNavItem(
                     icon: Icons.settings_outlined,
                     label: 'Settings',
-                    onTap: onSettingsPressed,
+                    isActive: _selectedIndex == 2,
+                    onTap: () => _selectTab(2, widget.onSettingsPressed),
                   ),
                 ),
               ],
@@ -844,56 +873,72 @@ class _BottomNavItem extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 30,
-              height: 28,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                gradient: isActive
-                    ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.neonPrimary.withValues(alpha: 0.95),
-                          AppColors.neonSecondary.withValues(alpha: 0.95),
-                        ],
-                      )
-                    : null,
-                boxShadow: isActive
-                    ? [
-                        BoxShadow(
-                          color: AppColors.neonPrimary.withValues(alpha: 0.28),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ]
-                    : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOutCubic,
+          margin: EdgeInsets.symmetric(
+            horizontal: isActive ? 8 : 0,
+            vertical: isActive ? 2 : 0,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            color: isActive
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.transparent,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 30,
+                height: 28,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  gradient: isActive
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.neonPrimary.withValues(alpha: 0.95),
+                            AppColors.neonSecondary.withValues(alpha: 0.95),
+                          ],
+                        )
+                      : null,
+                  boxShadow: isActive
+                      ? [
+                          BoxShadow(
+                            color: AppColors.neonPrimary.withValues(
+                              alpha: 0.22,
+                            ),
+                            blurRadius: 14,
+                            offset: const Offset(0, 5),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Icon(
+                  icon,
+                  color: isActive ? Colors.white : color,
+                  size: 22,
+                ),
               ),
-              child: Icon(
-                icon,
-                color: isActive ? Colors.white : color,
-                size: 22,
+              const SizedBox(height: 4),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: isActive
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
+                  fontSize: 11,
+                  height: 1,
+                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: isActive
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
-                fontSize: 11,
-                height: 1,
-                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

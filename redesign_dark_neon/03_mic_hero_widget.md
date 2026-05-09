@@ -17,3 +17,21 @@ Transform the current recorder button into a high-impact, audio-reactive hero el
 ## Verification
 - Create a widget preview to test the animation smoothness.
 - Ensure the glow doesn't look "pixelated" (use multiple layered shadows for smoothness).
+
+## Current Implementation Notes (May 9, 2026)
+- Implemented in `lib/ui/widgets/home/neon_mic_button.dart`.
+- The mic is now the Home screen hero interaction, not just a static button.
+- Uses `AnimationController`, `AnimatedBuilder`, and layered `Stack`/`BoxShadow` effects.
+- Idle state shows a large white mic core with blue/purple neon ring.
+- Press state adds:
+  - subtle compression
+  - ripple ring
+  - boosted glow
+  - temporary energy bars
+- Recording state keeps the mic visually alive with breathing glow and active bars.
+- Icons are Material icons for runtime consistency on the current Flutter build.
+
+## Lessons Learned
+- A reference-image-based redesign from AI tools produced the right concept but weak implementation details.
+- The mic needed interaction polish because it is the first thing users tap and the most important element for a short X demo video.
+- Overly decorative effects should be avoided unless they improve clarity or demo value.
