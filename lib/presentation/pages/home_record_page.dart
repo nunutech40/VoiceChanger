@@ -1,11 +1,17 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path/path.dart' as p;
+
+import '../../ui/theme/app_colors.dart';
+import '../../ui/theme/app_gradients.dart';
+import '../../ui/widgets/common/neon_glass_card.dart';
+import '../../ui/widgets/home/neon_mic_button.dart';
+import '../../ui/widgets/home/recording_list_tile.dart';
 import '../bloc/aura_voice_cubit.dart';
 import '../bloc/aura_voice_state.dart';
-import 'playback_template_page.dart';
 import 'full_history_page.dart';
+import 'playback_template_page.dart';
 
 class HomeRecordPage extends StatelessWidget {
   const HomeRecordPage({super.key});
@@ -13,14 +19,15 @@ class HomeRecordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB), // Clean off-white background
+      backgroundColor: AppColors.backgroundDeep,
+      extendBody: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
           'AuraVoice',
           style: TextStyle(
-            color: Color(0xFF1A1A1C), // Dark text
+            color: AppColors.textPrimary,
             fontSize: 24,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
@@ -28,7 +35,10 @@ class HomeRecordPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.drive_folder_upload, color: Color(0xFF3B82F6)),
+            icon: const Icon(
+              Icons.drive_folder_upload,
+              color: AppColors.neonPrimary,
+            ),
             onPressed: () {
               context.read<AuraVoiceCubit>().pickExternalFile();
             },
@@ -41,16 +51,23 @@ class HomeRecordPage extends StatelessWidget {
           if (state is AuraVoiceError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message, style: const TextStyle(color: Colors.white)),
-                backgroundColor: Colors.redAccent.shade700,
+                content: Text(
+                  state.message,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                backgroundColor: AppColors.error,
                 behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             );
           } else if (state is AuraVoicePlayback) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => PlaybackTemplatePage(audioPath: state.filePath)),
+              MaterialPageRoute(
+                builder: (_) => PlaybackTemplatePage(audioPath: state.filePath),
+              ),
             ).then((_) {
               context.read<AuraVoiceCubit>().resetToReady();
             });
@@ -58,121 +75,103 @@ class HomeRecordPage extends StatelessWidget {
         },
         builder: (context, state) {
           if (state is AuraVoiceInitial) {
-            return const Center(child: CircularProgressIndicator(color: Colors.white));
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.neonPrimary),
+            );
           }
 
           final isRecording = state is AuraVoiceRecording;
-          
-          return Column(
-            children: [
-              const SizedBox(height: 40),
-              // Prominent Record Button Area
-              Center(
-                child: GestureDetector(
-                  onTapDown: (_) => context.read<AuraVoiceCubit>().startRecording(),
-                  onTapUp: (_) => context.read<AuraVoiceCubit>().stopRecording(),
-                  onTapCancel: () => context.read<AuraVoiceCubit>().stopRecording(),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: isRecording ? 160 : 140,
-                    height: isRecording ? 160 : 140,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isRecording ? const Color(0xFF3B82F6) : Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: isRecording 
-                            ? const Color(0xFF3B82F6).withOpacity(0.4) 
-                            : const Color(0xFF8E8E93).withOpacity(0.15),
-                          blurRadius: isRecording ? 30 : 20,
-                          spreadRadius: isRecording ? 8 : 2,
-                          offset: const Offset(0, 8),
-                        )
-                      ],
-                    ),
-                    child: Icon(
-                      isRecording ? Icons.mic : Icons.mic_none,
-                      color: isRecording ? Colors.white : const Color(0xFF3B82F6),
-                      size: 50,
-                    ),
+
+          return Container(
+            decoration: BoxDecoration(gradient: AppGradients.backgroundLayered),
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                // Hero Mic Button Area
+                Center(
+                  child: NeonMicButton(
+                    size: 100,
+                    isRecording: isRecording,
+                    onPressed: () {
+                      if (isRecording) {
+                        context.read<AuraVoiceCubit>().stopRecording();
+                      } else {
+                        context.read<AuraVoiceCubit>().startRecording();
+                      }
+                    },
+                    onLongPress: () {
+                      context.read<AuraVoiceCubit>().startRecording();
+                    },
                   ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              Text(
-                isRecording ? "Recording... Release to process" : "Hold to record",
-                style: TextStyle(
-                  color: isRecording ? const Color(0xFF3B82F6) : const Color(0xFF8E8E93),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 50),
-              
-              // History Section
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.white, // Clean white history sheet
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(32),
-                      topRight: Radius.circular(32),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0x0A000000), // Very subtle top shadow
-                        blurRadius: 20,
-                        offset: Offset(0, -5),
-                      )
-                    ],
+                const SizedBox(height: 16),
+                Text(
+                  isRecording ? "Recording..." : "Hold to record",
+                  style: TextStyle(
+                    color: isRecording
+                        ? AppColors.neonPrimary
+                        : AppColors.textSecondary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.5,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(30, 30, 30, 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Recent Recordings",
-                              style: TextStyle(
-                                color: Color(0xFF1A1A1C), // Dark text
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            if (state is AuraVoiceReady && state.historyFiles.length > 3)
-                              TextButton(
-                                onPressed: () {
-                                  // Navigate to full history
-                                  // For now, we can just push a new page that passes the state
-                                  // Or a dedicated FullHistoryPage
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => const FullHistoryPage()),
-                                  ).then((_) {
-                                    context.read<AuraVoiceCubit>().resetToReady();
-                                  });
-                                },
-                                child: const Text(
-                                  "See All",
-                                  style: TextStyle(color: Color(0xFF3B82F6), fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 40),
+
+                // History Section with Glass Effect
+                Expanded(
+                  child: NeonGlassSurface(
+                    borderRadius: 32.0,
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Recent Recordings",
+                                style: TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                          ],
+                              if (state is AuraVoiceReady &&
+                                  state.historyFiles.length > 3)
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const FullHistoryPage(),
+                                      ),
+                                    ).then((_) {
+                                      context
+                                          .read<AuraVoiceCubit>()
+                                          .resetToReady();
+                                    });
+                                  },
+                                  child: const Text(
+                                    "See All",
+                                    style: TextStyle(
+                                      color: AppColors.neonPrimary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: _buildHistoryList(state, context),
-                      ),
-                    ],
+                        Expanded(child: _buildHistoryList(state, context)),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
@@ -186,31 +185,35 @@ class HomeRecordPage extends StatelessWidget {
           child: Text(
             "No recordings yet.\nImport a file or start recording.",
             textAlign: TextAlign.center,
-            style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
           ),
         );
       }
 
       // Limit to 3 items on home page
-      final displayCount = state.historyFiles.length > 3 ? 3 : state.historyFiles.length;
+      final displayCount = state.historyFiles.length > 3
+          ? 3
+          : state.historyFiles.length;
 
       return ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         itemCount: displayCount,
         itemBuilder: (context, index) {
           final path = state.historyFiles[index];
-          final fileName = p.basename(path);
+          final fileName = File(path).uri.pathSegments.last;
           final date = File(path).lastModifiedSync();
-          final isExported = fileName.startsWith('AuraVoice_');
-          
+          final formattedDate = "${date.day}/${date.month}/${date.year}";
+          final formattedTime =
+              "${date.hour}:${date.minute.toString().padLeft(2, '0')}";
+
           return Dismissible(
             key: Key(path),
             direction: DismissDirection.endToStart,
             background: Container(
-              margin: const EdgeInsets.only(bottom: 12),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444), // Red for delete
-                borderRadius: BorderRadius.circular(20),
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(16),
               ),
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -219,63 +222,31 @@ class HomeRecordPage extends StatelessWidget {
             onDismissed: (direction) {
               context.read<AuraVoiceCubit>().deleteAudio(path);
             },
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFF3F4F6)), // Light gray border
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x05000000), // Extremely subtle shadow
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  )
-                ]
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                leading: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isExported ? const Color(0xFFECFDF5) : const Color(0xFFEFF6FF), // Soft green or blue
-                    shape: BoxShape.circle,
+            child: RecordingListTile(
+              title: fileName,
+              subtitle: "$formattedDate • $formattedTime",
+              onPlay: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PlaybackTemplatePage(audioPath: path),
                   ),
-                  child: Icon(
-                    isExported ? Icons.check_circle_outline : Icons.audiotrack,
-                    color: isExported ? const Color(0xFF10B981) : const Color(0xFF3B82F6), // Green or Blue icon
-                  ),
-                ),
-                title: Text(
-                  fileName,
-                  style: const TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.w600, fontSize: 15),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Text(
-                    "${date.day}/${date.month}/${date.year} • ${date.hour}:${date.minute.toString().padLeft(2, '0')}",
-                    style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 13),
-                  ),
-                ),
-                trailing: const Icon(Icons.chevron_right, color: Color(0xFFD1D5DB)),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => PlaybackTemplatePage(audioPath: path)),
-                  ).then((_) {
-                    context.read<AuraVoiceCubit>().resetToReady();
-                  });
-                },
-              ),
+                ).then((_) {
+                  context.read<AuraVoiceCubit>().resetToReady();
+                });
+              },
+              onMenu: () {
+                // TODO: Show bottom sheet menu
+              },
             ),
           );
         },
       );
     }
-    
-    // When recording, show blurred/dimmed version
-    return const Center(child: Text("Processing...", style: TextStyle(color: Color(0xFF8E8E93))));
+
+    // When recording, show dimmed state
+    return const Center(
+      child: Text("Processing...", style: TextStyle(color: AppColors.textHint)),
+    );
   }
 }

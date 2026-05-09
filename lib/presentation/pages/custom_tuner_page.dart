@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/entities/audio_filter_entity.dart';
 import '../bloc/voice_tuner_cubit.dart';
 import '../bloc/voice_tuner_state.dart';
 
@@ -35,7 +34,11 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1A1A1C), size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Color(0xFF1A1A1C),
+            size: 20,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
@@ -56,7 +59,7 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                
+
                 // Pitch Control
                 _buildSliderCard(
                   title: "Pitch Shift",
@@ -70,9 +73,9 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
                     _applyCustomFilter();
                   },
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Speed Control
                 _buildSliderCard(
                   title: "Playback Speed",
@@ -86,9 +89,9 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
                     _applyCustomFilter();
                   },
                 ),
-                
+
                 const Spacer(),
-                
+
                 // Reset Button
                 SizedBox(
                   width: double.infinity,
@@ -111,7 +114,10 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
                     },
                     child: const Text(
                       "Reset to Default",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -144,7 +150,7 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
             color: Color(0x05000000),
             blurRadius: 10,
             offset: Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
@@ -163,12 +169,20 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
               const SizedBox(width: 12),
               Text(
                 title,
-                style: const TextStyle(color: Color(0xFF1A1A1C), fontSize: 16, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  color: Color(0xFF1A1A1C),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const Spacer(),
               Text(
                 "${value.toStringAsFixed(2)}x",
-                style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: color,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -180,7 +194,10 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
               thumbColor: Colors.white, // White thumb
               overlayColor: color.withOpacity(0.2),
               trackHeight: 6,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12, elevation: 4), // Larger thumb with shadow
+              thumbShape: const RoundSliderThumbShape(
+                enabledThumbRadius: 12,
+                elevation: 4,
+              ), // Larger thumb with shadow
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
             ),
             child: Slider(
@@ -195,8 +212,20 @@ class _CustomTunerPageState extends State<CustomTunerPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(min.toStringAsFixed(1), style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12)),
-                Text(max.toStringAsFixed(1), style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12)),
+                Text(
+                  min.toStringAsFixed(1),
+                  style: const TextStyle(
+                    color: Color(0xFF9CA3AF),
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  max.toStringAsFixed(1),
+                  style: const TextStyle(
+                    color: Color(0xFF9CA3AF),
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================
-# News App iOS Reset Script
+# VoiceChanger iOS Reset Script
 # Jalankan script ini setiap kali build iOS bermasalah:
 #   - Pod install gagal
 #   - DerivedData korup
@@ -15,7 +15,7 @@
 set -e  # Berhenti otomatis jika ada command yang gagal
 export LANG=en_US.UTF-8
 
-PROJECT_NAME="news_app"
+PROJECT_NAME="VoiceChanger"
 
 echo ""
 echo "============================================================"
@@ -43,42 +43,46 @@ rm -rf ios/Runner.xcworkspace
 echo "✅ Pods, Podfile.lock, dan xcworkspace dihapus."
 echo ""
 
-# [4/6] Hapus DerivedData Xcode yang korup
-# PENTING: File DerivedData dikunci oleh beberapa proses background, bukan hanya Xcode:
-#   - Xcode itu sendiri
-#   - XCBBuildService (Xcode background build worker, tetap jalan meski Xcode ditutup)
-#   - sourcekit-lsp (Apple Language Server untuk Swift)
-#   - Dart Analysis Server (dijalankan VS Code/Cursor/IDE saat project terbuka)
-# Semua harus dimatikan dulu sebelum DerivedData bisa dihapus dengan bersih.
-echo "🗄️  [4/6] Mematikan proses yang mengunci DerivedData..."
+# [4/6] Alihkan DerivedData ke folder project (biar gak bentrok dengan VS Code)
+# Masalah: VS Code (Dart Analysis Server) dan Xcode berebut akses ke
+# ~/Library/Developer/Xcode/DerivedData/ModuleCache.noindex
+# Akibatnya: Xcode error "unable to rename temporary .pcm.tmp"
+#
+# Solusi: Set DerivedData Xcode ke folder di dalam project sendiri,
+# jadi gak bentrok dengan system default yang diakses VS Code.
+echo "🗄️  [4/6] Alihkan DerivedData Xcode ke folder project..."
 
-# Tutup Xcode
+# Tutup Xcode dulu
 if pgrep -x "Xcode" > /dev/null; then
   echo "   → Menutup Xcode..."
   killall Xcode 2>/dev/null || true
 fi
 
-# Matikan Xcode background build services
-echo "   → Mematikan Xcode background services (XCBBuildService, sourcekit-lsp)..."
+# Matikan Xcode background services
 pkill -f "XCBBuildService" 2>/dev/null || true
 pkill -f "sourcekit-lsp" 2>/dev/null || true
 pkill -f "swift-frontend" 2>/dev/null || true
 pkill -f "com.apple.dt.SKAgent" 2>/dev/null || true
 
-# Matikan Dart Analysis Server (yang dijalankan VS Code/Cursor/IDE)
-echo "   → Mematikan Dart Analysis Server (IDE background process)..."
-pkill -f "analysis_server" 2>/dev/null || true
-pkill -f "dart_language_server" 2>/dev/null || true
-pkill -f "DartAnalysisServer" 2>/dev/null || true
+sleep 1
 
-sleep 2  # Tunggu semua proses benar-benar berhenti
+# Set DerivedData lokasi ke folder project
+# Xcode akan baca setting ini dari UserDefaults
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+XCODE_DD="$PROJECT_DIR/.ios_derived_data"
 
-echo "   → Menghapus DerivedData..."
-rm -rf ~/Library/Developer/Xcode/DerivedData/ModuleCache.noindex
-rm -rf ~/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex
-rm -rf ~/Library/Developer/Xcode/DerivedData/Runner-*
-rm -rf ~/Library/Developer/Xcode/DerivedData/Pods-*
-echo "✅ Semua proses dimatikan & DerivedData bersih."
+# Buat folder DerivedData di project
+mkdir -p "$XCODE_DD"
+
+# Set Xcode DerivedData path via UserDefaults
+# Ini bikin Xcode pake folder .ios_derived_data di project, bukan ~/Library/...
+defaults write com.apple.dt.Xcode IDECustomDerivedDataLocation "$XCODE_DD"
+
+# Bersihin DerivedData lama di system default (biar gak numpuk)
+rm -rf ~/Library/Developer/Xcode/DerivedData 2>/dev/null || true
+
+echo "✅ DerivedData Xcode dialihkan ke: $XCODE_DD"
+echo "   (VS Code & Dart Analysis Server gak akan ganggu lagi)"
 echo ""
 
 # [5/6] Pod Install Ulang

@@ -17,7 +17,11 @@ class FullHistoryPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1A1A1C), size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Color(0xFF1A1A1C),
+            size: 20,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
@@ -50,7 +54,7 @@ class FullHistoryPage extends StatelessWidget {
                 final fileName = p.basename(path);
                 final date = File(path).lastModifiedSync();
                 final isExported = fileName.startsWith('AuraVoice_');
-                
+
                 return Dismissible(
                   key: Key(path),
                   direction: DismissDirection.endToStart,
@@ -62,7 +66,10 @@ class FullHistoryPage extends StatelessWidget {
                     ),
                     alignment: Alignment.centerRight,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.delete_outline, color: Colors.white),
+                    child: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.white,
+                    ),
                   ),
                   onDismissed: (direction) {
                     context.read<AuraVoiceCubit>().deleteAudio(path);
@@ -78,25 +85,38 @@ class FullHistoryPage extends StatelessWidget {
                           color: Color(0x05000000),
                           blurRadius: 10,
                           offset: Offset(0, 4),
-                        )
-                      ]
+                        ),
+                      ],
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
                       leading: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isExported ? const Color(0xFFECFDF5) : const Color(0xFFEFF6FF),
+                          color: isExported
+                              ? const Color(0xFFECFDF5)
+                              : const Color(0xFFEFF6FF),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          isExported ? Icons.check_circle_outline : Icons.audiotrack,
-                          color: isExported ? const Color(0xFF10B981) : const Color(0xFF3B82F6),
+                          isExported
+                              ? Icons.check_circle_outline
+                              : Icons.audiotrack,
+                          color: isExported
+                              ? const Color(0xFF10B981)
+                              : const Color(0xFF3B82F6),
                         ),
                       ),
                       title: Text(
                         fileName,
-                        style: const TextStyle(color: Color(0xFF1A1A1C), fontWeight: FontWeight.w600, fontSize: 15),
+                        style: const TextStyle(
+                          color: Color(0xFF1A1A1C),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -104,14 +124,23 @@ class FullHistoryPage extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 4.0),
                         child: Text(
                           "${date.day}/${date.month}/${date.year} • ${date.hour}:${date.minute.toString().padLeft(2, '0')}",
-                          style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 13),
+                          style: const TextStyle(
+                            color: Color(0xFF8E8E93),
+                            fontSize: 13,
+                          ),
                         ),
                       ),
-                      trailing: const Icon(Icons.chevron_right, color: Color(0xFFD1D5DB)),
+                      trailing: const Icon(
+                        Icons.chevron_right,
+                        color: Color(0xFFD1D5DB),
+                      ),
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => PlaybackTemplatePage(audioPath: path)),
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                PlaybackTemplatePage(audioPath: path),
+                          ),
                         );
                       },
                     ),

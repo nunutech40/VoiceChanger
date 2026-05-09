@@ -5,7 +5,7 @@ class ApplyVoiceFilterUseCase {
   final IAudioRepository repository;
 
   ApplyVoiceFilterUseCase(this.repository);
-  
+
   void execute(AudioFilterEntity filter) {
     repository.applyPitchAndSpeed(filter.pitch, filter.speed);
   }
