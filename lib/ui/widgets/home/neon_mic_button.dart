@@ -2,19 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
 
-/// A hero mic button with neon glow and breathing animation.
-///
-/// Features:
-/// - Floating orb with layered BoxShadow for smooth neon glow
-/// - Breathing/pulsing animation via AnimationController
-/// - Subtle scale-up on tap
-/// - Clean minimalist mic icon
 class NeonMicButton extends StatefulWidget {
   const NeonMicButton({
     super.key,
     this.onPressed,
     this.onLongPress,
-    this.size = 80.0,
+    this.size = 188.0,
     this.isRecording = false,
   });
 
@@ -37,24 +30,12 @@ class _NeonMicButtonState extends State<NeonMicButton>
     super.initState();
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 1800),
     )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+    _pulseAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOutSine),
     );
-  }
-
-  @override
-  void didUpdateWidget(NeonMicButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isRecording != oldWidget.isRecording) {
-      if (widget.isRecording) {
-        _pulseController.repeat(reverse: true);
-      } else {
-        _pulseController.repeat(reverse: true); // tetap breathing walau idle
-      }
-    }
   }
 
   @override
@@ -68,58 +49,106 @@ class _NeonMicButtonState extends State<NeonMicButton>
     return AnimatedBuilder(
       animation: _pulseAnimation,
       builder: (context, child) {
-        final pulseValue = _pulseAnimation.value;
-        final glowColor = widget.isRecording
-            ? AppColors.neonPrimary
-            : AppColors.neonSecondary;
+        final pulse = _pulseAnimation.value;
+        final scale = widget.isRecording ? 1.0 + (pulse * 0.035) : 1.0;
+        final ringOpacity = widget.isRecording ? 0.9 : 0.62;
 
-        return Transform.scale(
-          scale: pulseValue,
+        return Semantics(
+          button: true,
+          label: widget.isRecording ? 'Stop recording' : 'Start recording',
           child: GestureDetector(
             onTap: widget.onPressed,
             onLongPress: widget.onLongPress,
-            child: Container(
-              width: widget.size,
-              height: widget.size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.surfaceDark,
-                boxShadow: [
-                  // Inner glow
-                  BoxShadow(
-                    color: glowColor.withValues(alpha: 0.3 * pulseValue),
-                    blurRadius: widget.size * 0.4,
-                    spreadRadius: widget.size * 0.1,
+            child: SizedBox.square(
+              dimension: widget.size,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Transform.scale(
+                    scale: scale,
+                    child: Container(
+                      width: widget.size,
+                      height: widget.size,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: SweepGradient(
+                          colors: [
+                            AppColors.neonPrimary.withValues(alpha: 0.05),
+                            AppColors.neonPrimary.withValues(alpha: 0.58),
+                            AppColors.neonSecondary.withValues(
+                              alpha: ringOpacity,
+                            ),
+                            AppColors.neonPrimary.withValues(alpha: 0.08),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.neonPrimary.withValues(
+                              alpha: 0.16 + (pulse * 0.08),
+                            ),
+                            blurRadius: widget.size * 0.24,
+                            spreadRadius: widget.size * 0.02,
+                          ),
+                          BoxShadow(
+                            color: AppColors.neonSecondary.withValues(
+                              alpha: 0.22 + (pulse * 0.08),
+                            ),
+                            blurRadius: widget.size * 0.2,
+                            spreadRadius: 0,
+                            offset: Offset(0, widget.size * 0.1),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  // Mid glow
-                  BoxShadow(
-                    color: glowColor.withValues(alpha: 0.15 * pulseValue),
-                    blurRadius: widget.size * 0.7,
-                    spreadRadius: widget.size * 0.05,
+                  Container(
+                    width: widget.size * 0.84,
+                    height: widget.size * 0.84,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF19213A),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.08),
+                        width: 1,
+                      ),
+                    ),
                   ),
-                  // Outer aura
-                  BoxShadow(
-                    color: glowColor.withValues(alpha: 0.08 * pulseValue),
-                    blurRadius: widget.size * 1.0,
-                    spreadRadius: widget.size * 0.02,
+                  Container(
+                    width: widget.size * 0.7,
+                    height: widget.size * 0.7,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white,
+                          Color(0xFFF6F8FF),
+                          Color(0xFFE9ECFF),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white.withValues(alpha: 0.18),
+                          blurRadius: 18,
+                          offset: const Offset(-4, -6),
+                        ),
+                        BoxShadow(
+                          color: AppColors.neonPrimary.withValues(alpha: 0.18),
+                          blurRadius: 30,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      widget.isRecording
+                          ? Icons.stop_rounded
+                          : Icons.mic_none_rounded,
+                      color: const Color(0xFF5261F6),
+                      size: widget.size * 0.28,
+                    ),
                   ),
                 ],
-              ),
-              child: Container(
-                margin: const EdgeInsets.all(4.0),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.backgroundDeep,
-                  border: Border.all(
-                    color: glowColor.withValues(alpha: 0.4),
-                    width: 1.5,
-                  ),
-                ),
-                child: Icon(
-                  widget.isRecording ? Icons.mic : Icons.mic_none,
-                  color: glowColor,
-                  size: widget.size * 0.4,
-                ),
               ),
             ),
           ),
